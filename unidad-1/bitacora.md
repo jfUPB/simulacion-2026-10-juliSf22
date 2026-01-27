@@ -79,9 +79,32 @@ pensé que cambiaria más
 pero la verdad no, sigue siendo bastante parecido a el original solo que ya no redondea por lo que asumo yo que es más probable que salgan varias veces ejemplo un numero menor a 1 ya que como no se redondean los decimales entran y puede llegar a hacer una lidea más larga si entra varias veces ahí por eso se ve más separado que el anterior.
 
 
+### Actividad 3
 
+distribución uniforme: todos los valores posibles tienen la misma probabilidad de ocurrir 
+
+ 
+distribución no uniforme: algunos valores tienen más probabilidad que otros, Los números siguen siendo aleatorios pero con una tendencia marcada a donde tenga más probabilidad de ocurrir, en cierto modo dicta un poco o bueno hace un poco más preedcible el resultado del sistema.
+
+
+
+ usamos la  randomGaussian(media, desviación)
+
+```
+ let stepX = randomGaussian(0.5, 0.5);
+  let stepY = randomGaussian(0, 0.5);
+
+  this.x += stepX;
+  this.y += stepY;
+```
+ 
+ <img width="1547" height="635" alt="image" src="https://github.com/user-attachments/assets/34a94ee2-fb2d-4e3e-9caf-9e8244c0c012" />
+
+  
+como la media es la tendencia central pues con un 0.5 en el eje x nos da una inclinacion a que se vaya hacia la derecha
 
 ## Bitácora de reflexión
 
 estuvo chevere :)
+
 
