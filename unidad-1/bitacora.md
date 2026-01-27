@@ -135,12 +135,102 @@ https://editor.p5js.org/juliSf22/sketches/Wk7DYZtdj
 
 <img width="1464" height="489" alt="image" src="https://github.com/user-attachments/assets/8b6cd071-0091-4741-88d6-2bc4af9b7d7c" />
 
+### Actividad 7
+```
+let walkers = [];
+let numWalkers = 50;
+let noiseScale = 0.01;
 
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  background(10);
+  for (let i = 0; i < numWalkers; i++) {
+    walkers.push(new Walker(random(width), random(height)));
+  }
+}
+
+function draw() {
+    noStroke();
+  fill(255, 120);
+
+  for (let w of walkers) {
+    w.update();
+    w.display();
+  }
+}
+
+class Walker {
+  constructor(x, y) {
+    this.pos = createVector(x, y);
+    this.t = random(1000);
+  }
+
+  update() {
+    // Dirección usando ruido Perlin
+    let angle = noise(this.pos.x * noiseScale,
+                      this.pos.y * noiseScale,
+                      this.t) * TWO_PI * 2;
+
+    let stepSize;
+
+    // Lévy flight (probabilidad baja de salto largo)
+    if (random(1) < 0.02) {
+      stepSize = pow(random(1), -1.5) * map(mouseX, 0, width, 2, 15);
+    } else {
+      stepSize = randomGaussian(2, 0.5);
+    }
+
+    let velocity = map(mouseY, 0, height, 0.5, 3);
+
+    this.pos.x += cos(angle) * stepSize * velocity;
+    this.pos.y += sin(angle) * stepSize * velocity;
+
+    this.t += 0.01;
+
+    // Bordes infinitos
+    if (this.pos.x > width) this.pos.x = 0;
+    if (this.pos.x < 0) this.pos.x = width;
+    if (this.pos.y > height) this.pos.y = 0;
+    if (this.pos.y < 0) this.pos.y = height;
+  }
+
+  display() {
+    // Tamaño con distribución normal
+    let size = constrain(randomGaussian(4, 1.5), 1, 8);
+
+    // Color con ruido Perlin
+    let r = map(noise(this.t), 0, 1, 100, 255);
+    let g = map(noise(this.t + 50), 0, 1, 50, 200);
+    let b = map(noise(this.t + 100), 0, 1, 150, 255);
+
+    noStroke();
+    fill(r, g, b, 150);
+    ellipse(this.pos.x, this.pos.y, size);
+  }
+}
+
+function keyPressed() {
+  if (key === 'r' || key === 'R') {
+    walkers = [];
+    for (let i = 0; i < numWalkers; i++) {
+      walkers.push(new Walker(random(width), random(height)));
+    }
+    background(10);
+  }
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
+
+```
+<img width="937" height="790" alt="image" src="https://github.com/user-attachments/assets/5cf37c33-4a5e-4a34-a789-6c4e6b0ad613" />
 
 ## Bitácora de reflexión
 
 
 estuvo chevere :)
+
 
 
 
