@@ -106,7 +106,7 @@ distribución no uniforme: algunos valores tienen más probabilidad que otros, L
 como la media es la tendencia central pues con un 0.5 en el eje x nos da una inclinacion a que se vaya hacia la derecha
 
 
-### aActividad 4:
+### Actividad 4:
 
 ```
 
@@ -232,6 +232,7 @@ function windowResized() {
 
 
 estuvo chevere :)
+
 
 
 
