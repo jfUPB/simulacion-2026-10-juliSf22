@@ -103,8 +103,44 @@ distribución no uniforme: algunos valores tienen más probabilidad que otros, L
   
 como la media es la tendencia central pues con un 0.5 en el eje x nos da una inclinacion a que se vaya hacia la derecha
 
+
+### aActividad 4:
+
+```
+
+function setup() {
+  createCanvas(640, 240);
+  background(255);
+}
+
+function draw() {
+  
+  let x = randomGaussian(320, 120);
+  noStroke();
+  
+  
+  let y = randomGaussian(320, 120);
+  noStroke();
+  
+  fill(0, 10);
+  circle(x, y, 15);
+
+}
+
+
+```
+
+https://editor.p5js.org/juliSf22/sketches/Wk7DYZtdj
+
+
+<img width="1464" height="489" alt="image" src="https://github.com/user-attachments/assets/8b6cd071-0091-4741-88d6-2bc4af9b7d7c" />
+
+
+
 ## Bitácora de reflexión
 
+
 estuvo chevere :)
+
 
 
