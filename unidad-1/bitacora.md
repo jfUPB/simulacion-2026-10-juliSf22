@@ -211,8 +211,6 @@ function setup() {
 }
 
 function draw() {
-    noStroke();
-  fill(255, 120);
 
   for (let w of walkers) {
     w.update();
@@ -227,14 +225,14 @@ class Walker {
   }
 
   update() {
-    // Dirección usando ruido Perlin
+    // ruido Perlin
     let angle = noise(this.pos.x * noiseScale,
                       this.pos.y * noiseScale,
                       this.t) * TWO_PI * 2;
 
     let stepSize;
 
-    // Lévy flight (probabilidad baja de salto largo)
+    // Lévy flight salto largo
     if (random(1) < 0.02) {
       stepSize = pow(random(1), -1.5) * map(mouseX, 0, width, 2, 15);
     } else {
@@ -256,10 +254,10 @@ class Walker {
   }
 
   display() {
-    // Tamaño con distribución normal
+    // distribución normal
     let size = constrain(randomGaussian(4, 1.5), 1, 8);
 
-    // Color con ruido Perlin
+    // Color ruido Perlin
     let r = map(noise(this.t), 0, 1, 100, 255);
     let g = map(noise(this.t + 50), 0, 1, 50, 200);
     let b = map(noise(this.t + 100), 0, 1, 150, 255);
@@ -284,6 +282,7 @@ function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 }
 
+
 ```
 https://editor.p5js.org/juliSf22/sketches/N3fE5KwTg
 
@@ -295,6 +294,7 @@ https://editor.p5js.org/juliSf22/sketches/N3fE5KwTg
 
 
 estuvo chevere :)
+
 
 
 
