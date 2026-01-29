@@ -197,6 +197,11 @@ function draw() {
 
 ### Actividad 7
 
+lo que queria hacer con este codigo era que al final resultara una pieza bonita o pues agradable a la vista usando codigo generativo, cambie varias opciones porque el codigo original no me gustaba, para empezar usé el ruido de perlin para generar un cambio suave de colores, además tambien lo usé para el movimiento, como no queria que solo caminaran (además tenia que poner otros temas) les puse un salto para que quedara más aleatorio por decirlo así.
+
+la mejor parte es el movimiento (perlin) porque queri que aunque fueran ligeros cambios se pudieran mover y hacer figuritas por lo que aumenté el "rango de movimiento" de 360 a 6*360
+
+
 ```js
 let walkers = [];
 let numWalkers = 50;
@@ -380,14 +385,29 @@ function windowResized() {
 <img width="937" height="790" alt="image" src="https://github.com/user-attachments/assets/5cf37c33-4a5e-4a34-a789-6c4e6b0ad613" />
 
 
-
 ## Bitácora de reflexión
 
 
+1: Describe la diferencia fundamental entre la aleatoriedad generada por random() y la apariencia de aleatoriedad del Ruido Perlin (noise()). ¿En qué tipo de situación usarías cada una?
+
+ el random pues como lo dice es random XD, por lo que puede generar numeros aleatorios muy diferentes entre sí, además de no estár limitado como perlin, ya que este siempre devolverá un valor "random" pero entre 0 y 1 usualmente usado para cambios suaves
+
+ 2: Explica con tus palabras qué es una distribución de probabilidad. ¿Qué diferencia visual produce una caminata aleatoria con una distribución uniforme versus una con una distribución normal?
+
+   una distribucion uniforme como pues su nombre lo indica es uniforme por lo que tiene la misma probabilidad de suceder caso contrario a la normal que lo que está mas al centro o en el promedio para con mayor probabilidad y lo que se va alejando o se inclina más a los extremos pase con menos frecuencia o que tenga menos probabilidad e suceder
 
 
+3: ¿Cuál es el papel de la aleatoriedad en el arte generativo? Menciona al menos dos funciones distintas que cumple
 
+  pues en mi concepto hay 2 muy importantes que sería el hecho de que ccada pieza al tener un componente "aleatorio" va a acambiar cada vez que se ejecute el programa y la otra es lo interesante que es que la "maquina" pueda sorprender al poder generar con un mismo codigo cosas que no son rigidas sino que podra decirse que tienen "vida o deciciones propias"
 
+ 4: Piensa en tu obra final (Actividad 07). Describe uno de los conceptos de aleatoriedad que usaste y explica por qué fue una elección adecuada para lograr el efecto que buscabas.
+
+   lo que yo queria era que pintara basicamente, no solo ver el movimiento pasajero sino que deje una huella, lo que hice fue usar ruido para lograrlo, ya que no solo queria que se marcara sino que se viera bomnito :)
+
+ 5: ¿Qué es un “paseo” o “caminata” (walk) en el contexto de la simulación? ¿Qué característica particular tiene una caminata de tipo “Lévy flight”?
+
+   pues la caminata tipo lévy fligth lo que hace es que de normal da pequeños saltitos pero de vez en cuando haga saltos largo, pues en mi simulacion se usó para que haya una brobailidad de que el salto sea más grande dependiendo de la posición del ratón.
 
 
 
