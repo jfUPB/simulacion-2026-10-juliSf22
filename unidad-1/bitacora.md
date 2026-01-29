@@ -11,7 +11,7 @@ diseña un conjunto de reglas, un sistema. no un resultado final, la aleatorieda
 
 strudel
 
-# estan vivoooooooos!!!!!
+**estan vivoooooooos!!!!!**
 
 
 ### actividad 2:
@@ -382,6 +382,7 @@ function windowResized() {
 
 
 ## Bitácora de reflexión
+
 
 
 
