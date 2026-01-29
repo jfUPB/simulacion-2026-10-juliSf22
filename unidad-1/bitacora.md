@@ -4,7 +4,7 @@
 
 ### analisis del segundo video
 
-https://www.youtube.com/watch?v=_8DMEHxOLQE
+[video referencia](https://www.youtube.com/watch?v=_8DMEHxOLQE)
 
 nos dice que se trata de crear imagenes a partir de un codigo, el cual iteras muchas veces, reglas simples que juntas pueden crear cosas increibles, no tener un camino que seguir, practicamente todas las veces que el software se ejecuta lo hace de manera diferente, por más que las computadoras son conocidas por su alta precision, el que puedan hacer cosas inesperadas hace que dibujar con codigo sea emocionante.
 diseña un conjunto de reglas, un sistema. no un resultado final, la aleatoriedad se usa para variar el resultado y que no sea igual.
@@ -408,6 +408,7 @@ function windowResized() {
  5: ¿Qué es un “paseo” o “caminata” (walk) en el contexto de la simulación? ¿Qué característica particular tiene una caminata de tipo “Lévy flight”?
 
    pues la caminata tipo lévy fligth lo que hace es que de normal da pequeños saltitos pero de vez en cuando haga saltos largo, pues en mi simulacion se usó para que haya una brobailidad de que el salto sea más grande dependiendo de la posición del ratón.
+
 
 
 
