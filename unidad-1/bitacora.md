@@ -14,8 +14,6 @@ strudel
 # estan vivoooooooos!!!!!
 
 
-## Bitácora de aplicación 
-
 ### actividad 2:
 quiero hacer 2 experimentos por lo que voy a hacer 2 predicciones 
 
@@ -195,9 +193,11 @@ function draw() {
 ```
 <img width="610" height="413" alt="image" src="https://github.com/user-attachments/assets/cc623755-13dd-432b-aa93-3a7029db5183" />
 
+## Bitácora de aplicación 
 
 ### Actividad 7
-```
+
+```js
 let walkers = [];
 let numWalkers = 50;
 let noiseScale = 0.01;
@@ -284,7 +284,8 @@ function windowResized() {
 
 
 ```
-```
+
+```js
 let walkers = []; //crea un arrayd de walkers
 let numWalkers = 50; // limitanumero maximo de walkers 50
 let noiseScale = 0.01; // esto es para que tenga un movimiento continuo con cambios suabes, no bruscos
@@ -371,10 +372,10 @@ function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 } // ajusta el canvas a la pestaña si esta sufre algún cambio
 
-
 ```
 
-https://editor.p5js.org/juliSf22/sketches/N3fE5KwTg
+[Enlace al proyecto en el editor de p5.js](https://editor.p5js.org/juliSf22/sketches/N3fE5KwTg)
+
 
 <img width="937" height="790" alt="image" src="https://github.com/user-attachments/assets/5cf37c33-4a5e-4a34-a789-6c4e6b0ad613" />
 
@@ -382,8 +383,6 @@ https://editor.p5js.org/juliSf22/sketches/N3fE5KwTg
 
 ## Bitácora de reflexión
 
-
-estuvo chevere :)
 
 
 
