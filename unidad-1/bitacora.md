@@ -137,6 +137,65 @@ https://editor.p5js.org/juliSf22/sketches/Wk7DYZtdj
 
 <img width="1464" height="489" alt="image" src="https://github.com/user-attachments/assets/8b6cd071-0091-4741-88d6-2bc4af9b7d7c" />
 
+### Actividad 5
+```
+let xoff = 0;
+let yoff = 0;
+
+function setup() {
+  createCanvas(600, 400);
+  background(255);
+}
+
+function draw() {
+  stroke(0, 150); 
+  let x = 0;
+  xoff = 0;
+
+  while (x < width) {
+  
+    let y = noise(xoff, yoff) * height * 1;
+    line(x, height, x, height - y);
+
+    xoff += 0.2 ;
+    x += 10;
+  }
+
+  yoff += 0.01; 
+}
+```
+
+
+### Actividad 6
+```
+let xoff = 0;
+let yoff = 0;
+
+function setup() {
+  createCanvas(600, 400);
+  background(255);
+}
+
+function draw() {
+  stroke(0, 150); 
+  let x = 0;
+  xoff = 0;
+
+  while (x < width) {
+  
+    let y = noise(xoff, yoff) * height * 1;
+    line(x, height, x, height - y);
+
+    xoff += 0.2 ;
+    x += 10;
+  }
+
+  yoff += 0.01; 
+}
+```
+<img width="610" height="413" alt="image" src="https://github.com/user-attachments/assets/cc623755-13dd-432b-aa93-3a7029db5183" />
+
+
 ### Actividad 7
 ```
 let walkers = [];
@@ -226,12 +285,17 @@ function windowResized() {
 }
 
 ```
+https://editor.p5js.org/juliSf22/sketches/N3fE5KwTg
+
 <img width="937" height="790" alt="image" src="https://github.com/user-attachments/assets/5cf37c33-4a5e-4a34-a789-6c4e6b0ad613" />
+
+
 
 ## Bitácora de reflexión
 
 
 estuvo chevere :)
+
 
 
 
