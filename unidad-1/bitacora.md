@@ -284,6 +284,96 @@ function windowResized() {
 
 
 ```
+```
+let walkers = []; //crea un arrayd de walkers
+let numWalkers = 50; // limitanumero maximo de walkers 50
+let noiseScale = 0.01; // esto es para que tenga un movimiento continuo con cambios suabes, no bruscos
+
+function setup() {
+  createCanvas(windowWidth, windowHeight); //un canvas de tamaño de la pestaña
+  background(10); // casi negro pero no
+  for (let i = 0; i < numWalkers; i++) {
+    walkers.push(new Walker(random(width), random(height))); 
+  } // se repite 50 veces creando los walkers en una posicion ramdom del canvas
+}
+
+function draw() { // se ejecuta 60 veces por s
+
+  for (let w of walkers) { // llama w a cada walker
+    w.update(); // actualiza la poscicion
+    w.display(); // los dibuja
+  }
+}
+
+class Walker { // es un molde para todos los walkers ya que funcionan igual
+  constructor(x, y) { // recive poscicion x,y?
+    this.pos = createVector(x, y); // setea un vector en la poscicion actual x , y
+    this.t = random(1000); // Da a cada walker un tiempo inicial' aleatorio entre 0 y 1000 para evita que todos tengan los mismos colores y movimientos sincronizados al inicio
+  }
+
+  update() {
+    // ruido Perlin
+    let angle = noise(this.pos.x * noiseScale,
+                      this.pos.y * noiseScale,
+                      this.t) * TWO_PI * 6; // esto hace que se muevan de forma ramdom pero con cierta tendencia y el 6 hace que pueda tener giros más extremos 
+
+    let stepSize;
+
+    // Lévy flight salto largo
+    if (random(1) < 0.02) { // tiene 2% de probabilidad de suceder
+      stepSize = pow(random(1), -1.5) * map(mouseX, 0, width, 2, 15); // los saltos largos que se multiplican por un valor que depende de si el mouse en x osea a lo horizontal está a la izquierda 2 o a la derecha 15 por lo que pueden sér más largos dependiendo
+    } else {
+      stepSize = randomGaussian(2, 0.5); // da un valor promedio de 2 y con una dispercion del 0.5 La mayoría de pasos serán entre 1.5 y 2.5 píxeles
+    }
+
+    let velocity = map(mouseY, 0, height, 0.5, 3); // setea una velocidad dependiendo de la poscicion del mouse en vertical siendo arriba 0.5 (lento) y abajo 3(rapido)
+
+    this.pos.x += cos(angle) * stepSize * velocity; // lo que hace es que se muva en x y deoende de la poscicion del mouse para la velocidad y los saltos
+    this.pos.y += sin(angle) * stepSize * velocity; // lo que hace es que se muva en y y deoende de la poscicion del mouse para la velocidad y los saltos
+
+    this.t += 0.01; // aumenta el tiempo 0.01 en el parametro this.t (unico para cada walker)
+
+    // Bordes infinitos
+    if (this.pos.x > width) this.pos.x = 0; 
+    if (this.pos.x < 0) this.pos.x = width;
+    if (this.pos.y > height) this.pos.y = 0;
+    if (this.pos.y < 0) this.pos.y = height;
+  } // basicamente si se sale del cambas por un lado salga del otro
+
+  display() {
+    // distribución normal
+    let size = constrain(randomGaussian(4, 1.5), 1, 8); // setea el tamaño como de media 4 con una variabilidad de 1.5 pero que solo esté limitado a 1 o 8
+
+    // Color ruido Perlin
+    let r = map(noise(this.t), 0, 1, 100, 255); //en el canal rojo del color crea un ruido que devuelve una cantidad entre 0 y 1 depeendiendo del resultado siendo 0 = 100 y 1 = 255 todo esto en t que se va actualizando 0.01 de antes
+    let g = map(noise(this.t + 50), 0, 1, 50, 200); //en el canal verde del color crea un ruido que devuelve una cantidad entre 0 y 1 depeendiendo del resultado siendo 0 = 50 y 1 = 200 todo esto en t + 50 que se va actualizando 0.01 de antes
+    let b = map(noise(this.t + 100), 0, 1, 150, 255); //en el canal azul del color crea un ruido que devuelve una cantidad entre 0 y 1 depeendiendo del resultado siendo 0 = 150 y 1 = 255 todo esto en  t + 100 que se va actualizando 0.01 de antes
+
+// el +50 y el +100 se usan para que se cree un degradado y no sea el mismo color siempre
+
+    noStroke();
+    fill(r, g, b, 150); // rellena la figura con los colores que seteamos antes y una opacidad
+    ellipse(this.pos.x, this.pos.y, size); // crea una elipse en la pscicion actual x, y y el tamaño establecido antes
+  }
+}
+
+function keyPressed() {
+  if (key === 'r' || key === 'R') {
+    walkers = [];
+    for (let i = 0; i < numWalkers; i++) {
+      walkers.push(new Walker(random(width), random(height)));
+    }
+    background(10);
+  }
+} // basicamente reinicia el programa a grandes razgos
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+} // ajusta el canvas a la pestaña si esta sufre algún cambio
+
+
+```
+
 https://editor.p5js.org/juliSf22/sketches/N3fE5KwTg
 
 <img width="937" height="790" alt="image" src="https://github.com/user-attachments/assets/5cf37c33-4a5e-4a34-a789-6c4e6b0ad613" />
@@ -294,6 +384,7 @@ https://editor.p5js.org/juliSf22/sketches/N3fE5KwTg
 
 
 estuvo chevere :)
+
 
 
 
