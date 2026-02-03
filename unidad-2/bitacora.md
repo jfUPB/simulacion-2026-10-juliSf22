@@ -140,6 +140,7 @@ codigo editado
 
 ```js
 
+
 function setup() {
     createCanvas(100, 100);
 }
@@ -150,9 +151,9 @@ function draw() {
     let v0 = createVector(50, 50);
     let v1 = createVector(30, 0);
     let v2 = createVector(0, 30);
-   let v5 = createVector(50,80);
+   let v5 = createVector(80,50);
     let v3 = p5.Vector.lerp(v1, v2, 0.5);
-   let v4 = p5.Vector.sub(v1, v2); 
+   let v4 = p5.Vector.sub(v2, v1); 
 
     drawArrow(v0, v1, 'red');
     drawArrow(v0, v2, 'blue');
@@ -181,6 +182,7 @@ function drawArrow(base, vec, myColor) {
 
 
 ## Bitácora de reflexión
+
 
 
 
