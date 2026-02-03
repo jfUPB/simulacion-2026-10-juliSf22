@@ -1,5 +1,7 @@
 # Unidad 2
 
+## Bitácora de proceso de aprendizaje
+
 ### Actividad 1:
 
 [simulacion 2026-10](http://juanferfranco.github.io/simulacion-2026-10/)
@@ -20,7 +22,7 @@ porque no está en p5js por lo que no puede suamr cada numer del vvector
 
 
 
-## Bitácora de proceso de aprendizaje
+
 
 
 ## Bitácora de aplicación 
@@ -28,4 +30,5 @@ porque no está en p5js por lo que no puede suamr cada numer del vvector
 
 
 ## Bitácora de reflexión
+
 
