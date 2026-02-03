@@ -177,11 +177,16 @@ function drawArrow(base, vec, myColor) {
     pop();
 }
 ```
+<img width="162" height="165" alt="image" src="https://github.com/user-attachments/assets/1b5682e7-ca0b-4956-98d1-5e10910fc9fd" />
+
+
+
 ## Bitácora de aplicación 
 
 
 
 ## Bitácora de reflexión
+
 
 
 
