@@ -20,6 +20,13 @@ porque no está en p5js por lo que no puede suamr cada numer del vvector
 
 ### Actividad 3:
 
+
+vectorizar un ramdom walk
+
+
+### Actividad 4:
+
+```js
 let position;
 
 function setup() {
@@ -40,6 +47,27 @@ function draw() {
     background(220);
     console.log("Only once");
 }
+```
+1- ¿Qué resultado esperas obtener en el programa anterior?:
+
+Espero que el vector position cambie sus valores después de llamar a playingVector, porque dentro de la función se modifican directamente las componentes x y y. el segundo console.log debería mostrar un vector distinto al inicial
+
+2- ¿Qué resultado obtuviste?:
+
+El primer console.log muestra (6, 9). Después de ejecutar playingVector(position), el segundo console.log muestra (20, 30). Esto confirma que el vector fue modificado correctamente desde dentro de la función
+
+3- Recuerda los conceptos de paso por valor y paso por referencia en programación
+
+Se realiza un paso por referencia. Los vectores en p5.js son objetos, y al pasarlos como parámetros se pasa la referencia al mismo objeto en memoria, no una copia de sus valores
+
+4- ¿Qué tipo de paso se está realizando en el código?
+
+Se realiza un paso por referencia. Los vectores en p5.js son objetos, y al pasarlos como parámetros se pasa la referencia al mismo objeto en memoria, no una copia de sus valores
+
+5- ¿Qué aprendiste?
+
+Aprendí que al pasar objetos como vectores a funciones, cualquier cambio dentro de la función afecta al objeto original. Para evitarlo, sería necesario crear una copia del vector antes de modificarlo.
+
 
 
 
@@ -49,6 +77,7 @@ function draw() {
 
 
 ## Bitácora de reflexión
+
 
 
 
