@@ -69,14 +69,119 @@ Se realiza un paso por referencia. Los vectores en p5.js son objetos, y al pasar
 Aprendí que al pasar objetos como vectores a funciones, cualquier cambio dentro de la función afecta al objeto original. Para evitarlo, sería necesario crear una copia del vector antes de modificarlo.
 
 
+### Actividad 5:
+
+¿Para qué sirve el método mag()? Nota que hay otro método llamado magSq(). ¿Cuál es la diferencia entre ambos? ¿Cuál es más eficiente?
+
+para ahorrarnos sacar o calcular la raiz
+
+¿Para qué sirve el método normalize()?
+
+para tener la direccion para que solo sea multiplicar por un nnumero y sacar la magnitud
+ajusta la magnitud del vector a 1 sin cambiar su dirección.
+
+Te encuentras con un periodista en la calle y te pregunta ¿Para qué sirve el método dot()? ¿Qué le responderías en un frase?
+
+producto punto y sirve para ver si es paralelo o perpendicular
+
+Ahora el mismo periodista curioso de antes te pregunta si le puedes dar una intuición geométrica acerca del producto cruz. Entonces te pregunta ¿Cuál es la interpretación geométrica del producto cruz de dos vectores? Tu respuesta debe incluir qué pasa con la orientación y la magnitud del vector resultante.
+
+sirve para enontrar un nuevo vector que sea perpendicular ambos vectores
+
+¿Para que te puede servir el método dist()?
+ para calular la distancia entre la (cabeza) de 2 vectores
+
+ ¿Para qué sirven los métodos normalize() y limit()?
+
+ajusta la magnitud del vector a 1 sin cambiar su dirección.
+
+limit() restringe la magnitud del vector a un valor máximo.
+
+### Actividad 6:
+
+sin editar
+
+```js
+
+function setup() {
+    createCanvas(100, 100);
+}
+
+function draw() {
+    background(200);
+
+    let v0 = createVector(50, 50);
+    let v1 = createVector(30, 0);
+    let v2 = createVector(0, 30);
+    let v3 = p5.Vector.lerp(v1, v2, 0.5);
+    drawArrow(v0, v1, 'red');
+    drawArrow(v0, v2, 'blue');
+    drawArrow(v0, v3, 'purple');
+}
+
+function drawArrow(base, vec, myColor) {
+    push();
+    stroke(myColor);
+    strokeWeight(3);
+    fill(myColor);
+    translate(base.x, base.y);
+    line(0, 0, vec.x, vec.y);
+    rotate(vec.heading());
+    let arrowSize = 7;
+    translate(vec.mag() - arrowSize, 0);
+    triangle(0, arrowSize / 2, 0, -arrowSize / 2, arrowSize, 0);
+    pop();
+}
+
+```
 
 
+codigo editado
 
+```js
+
+function setup() {
+    createCanvas(100, 100);
+}
+
+function draw() {
+    background(200);
+
+    let v0 = createVector(50, 50);
+    let v1 = createVector(30, 0);
+    let v2 = createVector(0, 30);
+   let v5 = createVector(50,80);
+    let v3 = p5.Vector.lerp(v1, v2, 0.5);
+   let v4 = p5.Vector.sub(v1, v2); 
+
+    drawArrow(v0, v1, 'red');
+    drawArrow(v0, v2, 'blue');
+    drawArrow(v0, v3, 'purple');
+   drawArrow(v5, v4, 'green');
+
+
+}
+
+function drawArrow(base, vec, myColor) {
+    push();
+    stroke(myColor);
+    strokeWeight(3);
+    fill(myColor);
+    translate(base.x, base.y);
+    line(0, 0, vec.x, vec.y);
+    rotate(vec.heading());
+    let arrowSize = 7;
+    translate(vec.mag() - arrowSize, 0);
+    triangle(0, arrowSize / 2, 0, -arrowSize / 2, arrowSize, 0);
+    pop();
+}
+```
 ## Bitácora de aplicación 
 
 
 
 ## Bitácora de reflexión
+
 
 
 
