@@ -20,7 +20,26 @@ porque no está en p5js por lo que no puede suamr cada numer del vvector
 
 ### Actividad 3:
 
+let position;
 
+function setup() {
+    createCanvas(400, 400);
+    position = createVector(6,9);
+    console.log(position.toString());
+    playingVector(position);
+    console.log(position.toString());
+    noLoop();
+}
+
+function playingVector(v){
+    v.x = 20;
+    v.y = 30;
+}
+
+function draw() {
+    background(220);
+    console.log("Only once");
+}
 
 
 
@@ -30,5 +49,6 @@ porque no está en p5js por lo que no puede suamr cada numer del vvector
 
 
 ## Bitácora de reflexión
+
 
 
