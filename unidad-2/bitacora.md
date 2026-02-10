@@ -183,9 +183,109 @@ function drawArrow(base, vec, myColor) {
 
 ## Bitácora de aplicación 
 
+```
+let movers = [];
+let mode = 1;
+
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  resetSystem();
+}
+
+function resetSystem() {
+  movers = [];
+  for (let i = 0; i < 120; i++) {
+    movers.push(new Mover(random(width), random(height), random(0.5, 3)));
+  }
+}
+
+function draw() {
+  background(10, 20);
+
+  for (let m of movers) {
+    let mouse = createVector(mouseX, mouseY);
+    let force = p5.Vector.sub(mouse, m.position);
+    let distance = constrain(force.mag(), 5, 200);
+    force.normalize();
+
+    // Regla base de fuerza
+    let strength = 0.5;
+
+    // Modificación según modo (experimento de aceleración)
+    if (mode === 1) {
+      strength = 0.5; // aceleración clásica
+    } else if (mode === 2) {
+      strength = map(distance, 0, width, 2, 0.1); // no lineal
+    } else if (mode === 3) {
+      strength = 0.3;
+      m.velocity.mult(0.98); // fricción fuerte
+    }
+
+    force.mult(strength);
+    m.applyForce(force);
+    m.update();
+    m.edges();
+    m.display();
+  }
+
+  displayUI();
+}
+
+function keyPressed() {
+  if (key === '1') mode = 1;
+  if (key === '2') mode = 2;
+  if (key === '3') mode = 3;
+  if (key === 'R' || key === 'r') resetSystem();
+}
+
+class Mover {
+  constructor(x, y, m) {
+    this.position = createVector(x, y);
+    this.velocity = p5.Vector.random2D();
+    this.acceleration = createVector(0, 0);
+    this.mass = m;
+  }
+
+  applyForce(force) {
+    let f = p5.Vector.div(force, this.mass);
+    this.acceleration.add(f);
+  }
+
+  update() {
+    this.velocity.add(this.acceleration);
+    this.velocity.limit(5);
+    this.position.add(this.velocity);
+    this.acceleration.mult(0);
+  }
+
+  display() {
+    noStroke();
+    fill(200, 180);
+    ellipse(this.position.x, this.position.y, this.mass * 6);
+  }
+
+  edges() {
+    if (this.position.x > width) this.position.x = 0;
+    if (this.position.x < 0) this.position.x = width;
+    if (this.position.y > height) this.position.y = 0;
+    if (this.position.y < 0) this.position.y = height;
+  }
+}
+
+function displayUI() {
+  fill(255);
+  textSize(12);
+  text("1: aceleración clásica | 2: no lineal | 3: fricción | R: reset", 20, height - 20);
+}
+
+
+```
+
+
 
 
 ## Bitácora de reflexión
+
 
 
 
