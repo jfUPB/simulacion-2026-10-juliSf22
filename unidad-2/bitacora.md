@@ -183,99 +183,90 @@ function drawArrow(base, vec, myColor) {
 
 ## Bitácora de aplicación 
 
-```
-let movers = [];
-let mode = 1;
+```js
+let entidades = [];
+let numEntidades = 90;
+let limpiarFondo = false;
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
-  resetSystem();
-}
+  createCanvas(800, 600);
+  background(250);
+  stroke(0, 60);
 
-function resetSystem() {
-  movers = [];
-  for (let i = 0; i < 120; i++) {
-    movers.push(new Mover(random(width), random(height), random(0.5, 3)));
+  for (let i = 0; i < numEntidades; i++) {
+    entidades.push(new Entidad());
   }
 }
 
 function draw() {
-  background(10, 20);
-
-  for (let m of movers) {
-    let mouse = createVector(mouseX, mouseY);
-    let force = p5.Vector.sub(mouse, m.position);
-    let distance = constrain(force.mag(), 5, 200);
-    force.normalize();
-
-    // Regla base de fuerza
-    let strength = 0.5;
-
-    // Modificación según modo (experimento de aceleración)
-    if (mode === 1) {
-      strength = 0.5; // aceleración clásica
-    } else if (mode === 2) {
-      strength = map(distance, 0, width, 2, 0.1); // no lineal
-    } else if (mode === 3) {
-      strength = 0.3;
-      m.velocity.mult(0.98); // fricción fuerte
-    }
-
-    force.mult(strength);
-    m.applyForce(force);
-    m.update();
-    m.edges();
-    m.display();
+  if (limpiarFondo) {
+    background(250, 40);
   }
 
-  displayUI();
+  for (let e of entidades) {
+    e.update();
+    e.display();
+  }
 }
 
 function keyPressed() {
-  if (key === '1') mode = 1;
-  if (key === '2') mode = 2;
-  if (key === '3') mode = 3;
-  if (key === 'R' || key === 'r') resetSystem();
+  if (key === 'f' || key === 'F') limpiarFondo = !limpiarFondo;
 }
 
-class Mover {
-  constructor(x, y, m) {
-    this.position = createVector(x, y);
-    this.velocity = p5.Vector.random2D();
-    this.acceleration = createVector(0, 0);
-    this.mass = m;
+class Entidad {
+  constructor() {
+    this.pos = createVector(random(width), random(height));
+    this.vel = p5.Vector.random2D();
+    this.acc = createVector(0, 0);
+
+    this.timer = 0;
+    this.duration = this.levyTime();
   }
 
-  applyForce(force) {
-    let f = p5.Vector.div(force, this.mass);
-    this.acceleration.add(f);
+  levyTime() {
+    // duración del impulso (Lévy)
+    return int(pow(random(1), -1.2) * 10);
   }
 
   update() {
-    this.velocity.add(this.acceleration);
-    this.velocity.limit(5);
-    this.position.add(this.velocity);
-    this.acceleration.mult(0);
+    if (this.timer <= 0) {
+      this.chooseNewAcceleration();
+      this.duration = this.levyTime();
+      this.timer = this.duration;
+    }
+
+    this.vel.add(this.acc);
+    this.vel.limit(2.5);
+    this.pos.add(this.vel);
+    this.timer--;
+
+    this.wrap();
+  }
+
+  chooseNewAcceleration() {
+    let angle = noise(
+      this.pos.x * 0.005,
+      this.pos.y * 0.005,
+      frameCount * 0.01
+    ) * TWO_PI * 2;
+
+    let magnitude = map(dist(mouseX, mouseY, this.pos.x, this.pos.y),
+                        0, width, 0.15, 0.01);
+
+    this.acc = p5.Vector.fromAngle(angle).mult(magnitude);
   }
 
   display() {
-    noStroke();
-    fill(200, 180);
-    ellipse(this.position.x, this.position.y, this.mass * 6);
+    strokeWeight(1.8);
+    point(this.pos.x, this.pos.y);
   }
 
-  edges() {
-    if (this.position.x > width) this.position.x = 0;
-    if (this.position.x < 0) this.position.x = width;
-    if (this.position.y > height) this.position.y = 0;
-    if (this.position.y < 0) this.position.y = height;
+  wrap() {
+    if (this.pos.x > width) this.pos.x = 0;
+    if (this.pos.x < 0) this.pos.x = width;
+    if (this.pos.y > height) this.pos.y = 0;
+    if (this.pos.y < 0) this.pos.y = height;
   }
-}
-
-function displayUI() {
-  fill(255);
-  textSize(12);
-  text("1: aceleración clásica | 2: no lineal | 3: fricción | R: reset", 20, height - 20);
 }
 
 
@@ -285,6 +276,7 @@ function displayUI() {
 
 
 ## Bitácora de reflexión
+
 
 
 
