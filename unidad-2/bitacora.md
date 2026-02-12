@@ -402,6 +402,17 @@ primero la velocidad se actualiza sumándole la aceleración, luego la posición
 ## Bitácora de reflexión
 ### Actividad 10:
 
+```js
+
+
+
+```
+
+
+<img width="323" height="274" alt="image" src="https://github.com/user-attachments/assets/b4dec1ab-b95e-49f4-99eb-031d1b566752" />
+
+
+
 
 
 
