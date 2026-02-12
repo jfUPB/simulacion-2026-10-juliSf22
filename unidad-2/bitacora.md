@@ -22,6 +22,24 @@ porque no está en p5js por lo que no puede suamr cada numer del vvector
 
 
 vectorizar un ramdom walk
+¿Qué resultado esperabas obtener?
+
+Esperaba que al trabajar con un vector y pasarlo a una función, el programa generara una nueva posición basada en ese vector, mostrando el cambio en sus valores.
+
+¿Qué resultado obtuviste?
+
+El vector sí cambió sus valores, pero noté que el vector original también se modificó cuando lo pasé a la función.
+
+¿Qué tipo de paso se realiza en el código?
+
+En este caso se está usando un objeto p5.Vector, y en JavaScript los objetos se pasan por referencia.
+Eso significa que cuando una función recibe ese vector y modifica sus propiedades (por ejemplo x o y), está alterando directamente el objeto original, no una copia.
+
+¿Qué aprendí?
+
+Comprendí mejor la diferencia entre pasar datos por valor y por referencia.
+Los tipos primitivos (como números) se copian y no afectan el original, mientras que los objetos comparten la misma referencia en memoria.
+Como p5.Vector es un objeto, cualquier modificación dentro de una función impacta el vector original.
 
 
 ### Actividad 4:
@@ -179,103 +197,187 @@ function drawArrow(base, vec, myColor) {
 ```
 <img width="162" height="165" alt="image" src="https://github.com/user-attachments/assets/1b5682e7-ca0b-4956-98d1-5e10910fc9fd" />
 
+¿Cuál es el concepto de Motion 101 y su interpretación geométrica?
 
+Motion 101 es la base del movimiento en programación con vectores. Se basa en tres elementos principales:
+
+Aceleración modifica la velocidad.
+
+Velocidad modifica la posición.
+
+Posición determina dónde se dibuja el objeto.
+
+Geométricamente, se puede entender como una cadena de vectores:
+
+La aceleración cambia la longitud o dirección de la flecha de velocidad.
+
+La velocidad actúa como una flecha que indica hacia dónde y qué tan rápido se mueve el objeto.
+
+Al sumar la velocidad a la posición en cada frame, el objeto avanza siguiendo esa dirección.
+
+Es como si en cada cuadro el objeto siguiera la flecha de su velocidad actual.
+
+¿Cómo se aplica en el ejemplo?
+
+En el ejemplo del Mover:
+
+update() se encarga de actualizar la física (aceleración → velocidad → posición).
+
+show() dibuja el objeto usando su posición actual.
+
+checkEdges() permite que el objeto reaparezca del otro lado cuando toca un borde, creando un espacio continuo.
+
+draw() ejecuta todo en orden cada frame.
+
+En resumen, el movimiento se produce acumulando pequeños cambios en cada cuadro.
+
+
+### Actividad 7:
+¿Qué observaste al usar distintos tipos de aceleración?
+
+Noté que dependiendo de cómo se calcule la aceleración, el comportamiento del objeto cambia completamente:
+
+Aceleración constante:
+Produce un movimiento uniforme y predecible, generalmente en línea recta.
+
+Aceleración aleatoria:
+Hace que el objeto se mueva de forma impredecible y errática, cambiando de dirección constantemente.
+
+Aceleración hacia el mouse:
+Genera un movimiento más controlado y fluido, ya que el objeto se dirige hacia un punto específico. Se siente más natural porque responde a una referencia clara.
+
+En conclusión, pequeños cambios en la fórmula de aceleración producen trayectorias muy distintas. La aceleración es lo que realmente define el comportamiento del movimiento.
 
 ## Bitácora de aplicación 
+La idea era hacer algo que se viera bonito y fluido, pero que no fuera simplemente partículas moviéndose al azar.
+Quería mezclar tres cosas de los ejemplos anteriores:
+
+-El movimiento orgánico tipo olas (Perlin Noise).
+-l cambio de color y vibración tipo ondas.
+
+Básicamente, el sistema es un montón de partículas que se mueven con un flujo suave, pero cuando el mouse se acerca, reaccionan. No huyen como locas, solo se desplazan un poco formando una especie de onda alrededor del cursor, no quiero nada tan alocado, sol un movimiento "suave"
+
+
+
+
+
 
 ```js
-let entidades = [];
-let numEntidades = 90;
-let limpiarFondo = false;
+let particles = [];
+let total = 350;
 
 function setup() {
-  createCanvas(800, 600);
-  background(250);
-  stroke(0, 60);
+  createCanvas(900, 600);
+  colorMode(HSB, 360, 100, 100, 100);
+  background(230, 40, 10);
 
-  for (let i = 0; i < numEntidades; i++) {
-    entidades.push(new Entidad());
+  for (let i = 0; i < total; i++) {
+    particles.push(new Petal());
   }
 }
 
 function draw() {
-  if (limpiarFondo) {
-    background(250, 40);
+  fill(230, 40, 10, 15);
+  noStroke();
+  rect(0, 0, width, height);
+
+  for (let p of particles) {
+    p.applyFlow();
+    p.softRepel();
+    p.oscillate();
+    p.update();
+    p.display();
+  }
+}
+
+class Petal {
+  constructor() {
+    this.position = createVector(random(width), random(height));
+    this.velocity = createVector(0, 0);
+    this.acceleration = createVector(0, 0);
+    this.maxSpeed = 2;
+    this.noiseOffset = random(1000);
+    this.baseHue = random(180, 320);
+    this.size = random(3, 6);
   }
 
-  for (let e of entidades) {
-    e.update();
-    e.display();
+  applyFlow() {
+    let angle = noise(this.position.x * 0.002, this.position.y * 0.002, frameCount * 0.002) * TWO_PI * 2;
+    let flow = p5.Vector.fromAngle(angle);
+    flow.setMag(0.1);
+    this.acceleration.add(flow);
+  }
+
+  softRepel() {
+    let mouse = createVector(mouseX, mouseY);
+    let dir = p5.Vector.sub(this.position, mouse);
+    let d = dir.mag();
+
+    if (d < 150) {
+      let strength = map(d, 0, 150, 0.5, 0);
+      dir.setMag(strength);
+      this.acceleration.add(dir);
+    }
+  }
+
+  oscillate() {
+    let wave = sin(frameCount * 0.05 + this.noiseOffset) * 0.05;
+    let perp = createVector(-this.velocity.y, this.velocity.x);
+    perp.setMag(wave);
+    this.acceleration.add(perp);
+  }
+
+  update() {
+    this.velocity.add(this.acceleration);
+    this.velocity.limit(this.maxSpeed);
+    this.position.add(this.velocity);
+    this.acceleration.mult(0);
+
+    if (this.position.x > width) this.position.x = 0;
+    if (this.position.x < 0) this.position.x = width;
+    if (this.position.y > height) this.position.y = 0;
+    if (this.position.y < 0) this.position.y = height;
+  }
+
+  display() {
+    let hueShift = sin(frameCount * 0.02 + this.noiseOffset) * 20;
+    let finalHue = (this.baseHue + hueShift + 360) % 360;
+
+    noStroke();
+    fill(finalHue, 70, 100, 80);
+    ellipse(this.position.x, this.position.y, this.size);
   }
 }
 
 function keyPressed() {
-  if (key === 'f' || key === 'F') limpiarFondo = !limpiarFondo;
-}
-
-class Entidad {
-  constructor() {
-    this.pos = createVector(random(width), random(height));
-    this.vel = p5.Vector.random2D();
-    this.acc = createVector(0, 0);
-
-    this.timer = 0;
-    this.duration = this.levyTime();
-  }
-
-  levyTime() {
-    // duración del impulso (Lévy)
-    return int(pow(random(1), -1.2) * 10);
-  }
-
-  update() {
-    if (this.timer <= 0) {
-      this.chooseNewAcceleration();
-      this.duration = this.levyTime();
-      this.timer = this.duration;
+  if (key === ' ') {
+    for (let p of particles) {
+      p.velocity.mult(-1);
     }
-
-    this.vel.add(this.acc);
-    this.vel.limit(2.5);
-    this.pos.add(this.vel);
-    this.timer--;
-
-    this.wrap();
-  }
-
-  chooseNewAcceleration() {
-    let angle = noise(
-      this.pos.x * 0.005,
-      this.pos.y * 0.005,
-      frameCount * 0.01
-    ) * TWO_PI * 2;
-
-    let magnitude = map(dist(mouseX, mouseY, this.pos.x, this.pos.y),
-                        0, width, 0.15, 0.01);
-
-    this.acc = p5.Vector.fromAngle(angle).mult(magnitude);
-  }
-
-  display() {
-    strokeWeight(1.8);
-    point(this.pos.x, this.pos.y);
-  }
-
-  wrap() {
-    if (this.pos.x > width) this.pos.x = 0;
-    if (this.pos.x < 0) this.pos.x = width;
-    if (this.pos.y > height) this.pos.y = 0;
-    if (this.pos.y < 0) this.pos.y = height;
   }
 }
 
 
 ```
 
+<img width="753" height="570" alt="image" src="https://github.com/user-attachments/assets/bd77f296-0240-4006-ab5c-950db627a4c6" />
 
+Ruido Perlin 
+Esto les da un movimiento continuo y natural
+
+Repulsión suave al mouse 
+Cuando el mouse se acerca, se aplica una fuerza que empuja las partículas hacia afuera
+
+Motion 101:
+primero la velocidad se actualiza sumándole la aceleración, luego la posición se actualiza sumándole la velocidad, después limito la velocidad para que no crezca sin control y finalmente reinicio la aceleración en cada frame, esa secuencia es la base de todo el comportamiento. La aceleración es la que define cómo se quiere mover la partícula en ese instante (si fluye, si se aleja del mouse, si vibra). La velocidad acumula ese efecto a lo largo del tiempo, generando continuidad en el movimiento. Y la posición simplemente refleja el resultado final en pantalla. Si no limitara la velocidad, las partículas empezarían a moverse cada vez más rápido hasta volverse incontrolables. Y si no reiniciara la aceleración, las fuerzas se acumularían indefinidamente, por eso Motion 101 funciona como el motor del sistema, organiza y controla toda la dinámica del movimiento
+
+
+
+[p5js_Codigo_Unidad2](https://editor.p5js.org/juliSf22/sketches/CtqU-vh0w)
 
 
 ## Bitácora de reflexión
+
 
 
 
