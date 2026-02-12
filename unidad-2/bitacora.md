@@ -403,13 +403,132 @@ primero la velocidad se actualiza sumándole la aceleración, luego la posición
 ### Actividad 10:
 
 ```js
+let particles = [];
+const numParticles = 100;
 
+function setup() {
+  createCanvas(windowWidth, windowHeight);
 
+  for (let i = 0; i < numParticles; i++) {
+    particles.push(new Particle("purple", color(180, 80, 255)));
+    particles.push(new Particle("blue", color(80, 180, 255)));
+    particles.push(new Particle("green", color(100, 255, 120)));
+  }
+}
+
+function draw() {
+  background(10, 40);
+
+  for (let p of particles) {
+    p.applyBehaviors(particles);
+    p.update();
+    p.edges();
+    p.display();
+  }
+}
+
+class Particle {
+  constructor(type, col) {
+    this.pos = createVector(random(width), random(height));
+    this.vel = p5.Vector.random2D().mult(random(0.5, 2));
+    this.acc = createVector(0, 0);
+    this.type = type;
+    this.color = col;
+    this.size = random(4, 8);
+    this.maxSpeed = 2.5;
+    this.friction = 0.98;
+  }
+
+  update() {
+    this.vel.add(this.acc);
+    this.vel.limit(this.maxSpeed);
+    this.pos.add(this.vel);
+    this.acc.mult(0);
+    this.vel.mult(this.friction);
+  }
+
+  applyForce(force) {
+    this.acc.add(force);
+  }
+
+  applyBehaviors(others) {
+    for (let other of others) {
+      if (other === this) continue;
+
+      let force = p5.Vector.sub(other.pos, this.pos);
+      let d = force.mag();
+
+      if (d > 0 && d < 220) {
+        force.normalize();
+
+        let distanceFactor = map(d, 0, 220, 1, 0);
+        let strength = 0;
+
+        if (this.type === "purple") {
+          if (other.type === "green" || other.type === "blue") strength = 0.6;
+          if (other.type === "purple") strength = -0.6;
+        }
+
+        if (this.type === "blue") {
+          if (other.type === "purple") strength = -0.8;
+          if (other.type === "green" || other.type === "blue") strength = 0.5;
+        }
+
+        if (this.type === "green") {
+          if (other.type === "purple" || other.type === "blue") strength = -0.9;
+          if (other.type === "green") strength = 0.7;
+        }
+
+        if (strength < 0) {
+          strength *= 2.5;
+          distanceFactor = pow(distanceFactor, 0.5);
+        }
+
+        if (d < 25) {
+          strength = -4;
+        }
+
+        force.mult(strength * distanceFactor);
+        this.applyForce(force);
+      }
+    }
+  }
+
+  edges() {
+    let bounce = -0.9;
+
+    if (this.pos.x < 0 || this.pos.x > width) {
+      this.vel.x *= bounce;
+    }
+
+    if (this.pos.y < 0 || this.pos.y > height) {
+      this.vel.y *= bounce;
+    }
+
+    this.pos.x = constrain(this.pos.x, 0, width);
+    this.pos.y = constrain(this.pos.y, 0, height);
+  }
+
+  display() {
+    noStroke();
+
+    fill(red(this.color), green(this.color), blue(this.color), 50);
+    ellipse(this.pos.x, this.pos.y, this.size * 3);
+
+    fill(this.color);
+    ellipse(this.pos.x, this.pos.y, this.size);
+  }
+}
 
 ```
+Mi obra generativa es una simulación inspirada en el concepto del video, pues de que las particuas peden tener "vida propia", donde múltiples partículas interactúan en un espacio digital, cada una regida por reglas específicas de atracción y repulsión, estas reglas varían según el color de la partícula, de modo que no todas responden igual: algunas se atraen, otras se repelen, y otras generan equilibrios inestables. Además, estas interacciones ocurren también entre partículas del mismo color, dando lugar a patrones y caos xd
 
 
 <img width="323" height="274" alt="image" src="https://github.com/user-attachments/assets/b4dec1ab-b95e-49f4-99eb-031d1b566752" />
+
+<img width="643" height="444" alt="image" src="https://github.com/user-attachments/assets/fe4d3158-6c7c-4f33-926e-a09c73024ad4" />
+
+
 
 
 
