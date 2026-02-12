@@ -259,9 +259,33 @@ Quería mezclar tres cosas de los ejemplos anteriores:
 Básicamente, el sistema es un montón de partículas que se mueven con un flujo suave, pero cuando el mouse se acerca, reaccionan. No huyen como locas, solo se desplazan un poco formando una especie de onda alrededor del cursor, no quiero nada tan alocado, sol un movimiento "suave"
 
 
+### Actividad 8:
+¿Qué observaste al usar distintos tipos de aceleración?
 
+Noté que dependiendo de cómo se calcule la aceleración, el comportamiento del objeto cambia completamente:
 
+Aceleración constante:
+Produce un movimiento uniforme y predecible, generalmente en línea recta.
 
+Aceleración aleatoria:
+Hace que el objeto se mueva de forma impredecible y errática, cambiando de dirección constantemente.
+
+Aceleración hacia el mouse:
+Genera un movimiento más controlado y fluido, ya que el objeto se dirige hacia un punto específico. Se siente más natural porque responde a una referencia clara.
+
+En conclusión, pequeños cambios en la fórmula de aceleración producen trayectorias muy distintas. La aceleración es lo que realmente define el comportamiento del movimiento.
+
+## Bitácora de aplicación 
+La idea era hacer algo que se viera bonito y fluido, pero que no fuera simplemente partículas moviéndose al azar.
+Quería mezclar tres cosas de los ejemplos anteriores:
+
+-El movimiento orgánico tipo olas (Perlin Noise).
+
+-l cambio de color y vibración tipo ondas.
+
+Básicamente, el sistema es un montón de partículas que se mueven con un flujo suave, pero cuando el mouse se acerca, reaccionan. No huyen como locas, solo se desplazan un poco formando una especie de onda alrededor del cursor, no quiero nada tan alocado, sol un movimiento "suave"
+
+### Actividad 9:
 
 ```js
 let particles = [];
@@ -376,6 +400,9 @@ primero la velocidad se actualiza sumándole la aceleración, luego la posición
 
 
 ## Bitácora de reflexión
+### Actividad 10:
+
+
 
 
 
