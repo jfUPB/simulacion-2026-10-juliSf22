@@ -253,6 +253,7 @@ La idea era hacer algo que se viera bonito y fluido, pero que no fuera simplemen
 Quería mezclar tres cosas de los ejemplos anteriores:
 
 -El movimiento orgánico tipo olas (Perlin Noise).
+
 -l cambio de color y vibración tipo ondas.
 
 Básicamente, el sistema es un montón de partículas que se mueven con un flujo suave, pero cuando el mouse se acerca, reaccionan. No huyen como locas, solo se desplazan un poco formando una especie de onda alrededor del cursor, no quiero nada tan alocado, sol un movimiento "suave"
@@ -362,8 +363,6 @@ function keyPressed() {
 
 <img width="753" height="570" alt="image" src="https://github.com/user-attachments/assets/bd77f296-0240-4006-ab5c-950db627a4c6" />
 
-Ruido Perlin 
-Esto les da un movimiento continuo y natural
 
 Repulsión suave al mouse 
 Cuando el mouse se acerca, se aplica una fuerza que empuja las partículas hacia afuera
@@ -377,6 +376,7 @@ primero la velocidad se actualiza sumándole la aceleración, luego la posición
 
 
 ## Bitácora de reflexión
+
 
 
 
