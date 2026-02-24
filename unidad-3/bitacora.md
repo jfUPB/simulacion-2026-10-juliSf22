@@ -28,6 +28,7 @@ class Mover {
 
 ````js
 let sheep = [];
+let frenzy = false;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -53,21 +54,25 @@ function draw() {
   }
 }
 
-// 🌿 FONDO PASTO
+function keyPressed() {
+  if (key === 'f' || key === 'F') {
+    frenzy = !frenzy;
+  }
+}
+
+// 🌿 fondo pasto
 function drawGrassBackground() {
   for (let y = 0; y < height; y++) {
     let inter = map(y, 0, height, 0, 1);
-
-    let c1 = color(120, 180, 90);   // verde claro
-    let c2 = color(40, 100, 50);    // verde oscuro
-
+    let c1 = color(120, 180, 90);
+    let c2 = color(40, 100, 50);
     let c = lerpColor(c1, c2, inter);
     stroke(c);
     line(0, y, width, y);
   }
 }
 
-// 🐑 CLASE
+// 🐑 clase
 class Sheep {
   constructor(x, y) {
     this.pos = createVector(x, y);
@@ -81,15 +86,29 @@ class Sheep {
     this.acc.add(force);
   }
 
-  // 🧠 COMPORTAMIENTO DE REBAÑO
   flock(sheep) {
     let align = this.align(sheep);
     let cohesion = this.cohesion(sheep);
     let separation = this.separation(sheep);
 
-    align.mult(1.0);
-    cohesion.mult(0.6);
-    separation.mult(1.5);
+    if (frenzy) {
+      align.mult(0.3);
+      cohesion.mult(0.1);
+      separation.mult(2.0);
+
+      let angle = random(TWO_PI);
+      let chaos = p5.Vector.fromAngle(angle);
+      chaos.mult(0.5);
+      this.applyForce(chaos);
+
+      this.maxSpeed = 4;
+    } else {
+      align.mult(1.0);
+      cohesion.mult(0.6);
+      separation.mult(1.5);
+
+      this.maxSpeed = 2.5;
+    }
 
     this.applyForce(align);
     this.applyForce(cohesion);
@@ -168,7 +187,6 @@ class Sheep {
     return steering;
   }
 
-  // 🐕 HUIR DEL PERRO
   flee(mx, my) {
     let dog = createVector(mx, my);
     let desired = p5.Vector.sub(this.pos, dog);
@@ -182,17 +200,26 @@ class Sheep {
     }
   }
 
+  // ✅ fricción como fuerza (NO damping directo)
+  applyFriction() {
+    let friction = this.vel.copy();
+    friction.mult(-1);
+
+    if (friction.mag() > 0) {
+      friction.normalize();
+      friction.mult(0.03);
+      this.applyForce(friction);
+    }
+  }
+
   update() {
+    this.applyFriction();
+
     this.vel.add(this.acc);
-
-    // fricción (más natural)
-    this.vel.mult(0.98);
-
     this.vel.limit(this.maxSpeed);
     this.pos.add(this.vel);
     this.acc.mult(0);
 
-    // bordes
     if (this.pos.x > width) this.pos.x = 0;
     if (this.pos.x < 0) this.pos.x = width;
     if (this.pos.y > height) this.pos.y = 0;
@@ -202,10 +229,10 @@ class Sheep {
   show() {
     let speed = this.vel.mag();
 
-    if (speed > 1.5) {
-      textSize(22);
+    if (frenzy) {
+      textSize(24);
     } else {
-      textSize(18);
+      textSize(speed > 1.5 ? 22 : 18);
     }
 
     text("🐑", this.pos.x, this.pos.y);
@@ -420,5 +447,6 @@ class Sheep {
 
 
 ## Bitácora de reflexión
+
 
 
