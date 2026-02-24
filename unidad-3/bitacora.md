@@ -441,8 +441,11 @@ class Sheep {
 }
 ````
 
+<img width="816" height="692" alt="image" src="https://github.com/user-attachments/assets/5ee50fd0-efa0-4059-9bef-129bb5a61be1" />
+
 
 ## Bitácora de reflexión
+
 
 
 
