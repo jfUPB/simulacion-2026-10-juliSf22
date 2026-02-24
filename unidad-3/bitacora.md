@@ -24,7 +24,7 @@ class Mover {
 
 
 ## Bitácora de aplicación 
-
+Historia: lo que quria contar era basicamente "encarnarte" en un perro pastor, pues poder jugar como dirigiendo las obejas y así, aparte cuando presionas una tecla las obejas se "asustan" osea su movimiento es más erratico y son difisiles de controlar
 
 ````js
 let sheep = [];
@@ -42,7 +42,6 @@ function setup() {
 function draw() {
   drawGrassBackground();
 
-  // 🐕 perro
   textSize(28);
   text("🐕", mouseX, mouseY);
 
@@ -60,7 +59,6 @@ function keyPressed() {
   }
 }
 
-// 🌿 fondo pasto
 function drawGrassBackground() {
   for (let y = 0; y < height; y++) {
     let inter = map(y, 0, height, 0, 1);
@@ -72,7 +70,6 @@ function drawGrassBackground() {
   }
 }
 
-// 🐑 clase
 class Sheep {
   constructor(x, y) {
     this.pos = createVector(x, y);
@@ -200,7 +197,6 @@ class Sheep {
     }
   }
 
-  // ✅ fricción como fuerza (NO damping directo)
   applyFriction() {
     let friction = this.vel.copy();
     friction.mult(-1);
@@ -447,6 +443,7 @@ class Sheep {
 
 
 ## Bitácora de reflexión
+
 
 
 
