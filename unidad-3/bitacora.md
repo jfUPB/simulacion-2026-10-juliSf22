@@ -6,7 +6,7 @@
 
 ### Actividad 1: 
 
-bueno pues la verdad un poco preocupante lo que dice pero muy ierto
+bueno pues la verdad un poco preocupante lo que dice pero muy cierto
 
 ### Actividad 2: 
 
@@ -439,8 +439,119 @@ que es el marco de movimiento motion 101? : basicamente es el usos de fuersas pa
 
 y en cuanto a la relacion de fuerza, aceleracion, velocidad y posicion es justamente esa, hay una fuerza que genera celeracion que a la vez genera velocidad que produce un cambio en la poscicion, probocando justamente un movimiento a partir de fuerzas
 
+ ````js
+
+let cables = [];
+let numCables = 6;   
+let maxBalls = 3;    
+
+function setup() {
+  createCanvas(800, 700);
+
+  let spacing = width / (numCables + 1);
+
+  for (let i = 1; i <= numCables; i++) {
+    let x = i * spacing;
+    let balls = [];
+
+    for (let j = 0; j < maxBalls; j++) {
+      let mass = random(0.8, 2);
+      balls.push(new Ball(x, -j * 120, mass));
+    }
+
+    cables.push(new Cable(x, balls));
+  }
+}
+
+function draw() {
+  background(245);
+
+  let gravity = createVector(0, 0.35);
+
+  for (let cable of cables) {
+    cable.display();
+    cable.update(gravity);
+  }
+}
+
+class Cable {
+  constructor(x, balls) {
+    this.x = x;
+    this.balls = balls;
+  }
+
+  update(gravity) {
+    for (let ball of this.balls) {
+      ball.applyForce(gravity);
+      ball.update();
+    }
+  }
+
+  display() {
+    stroke(0);
+    strokeWeight(2);
+    line(this.x, 0, this.x, height);
+
+    for (let ball of this.balls) {
+      ball.display();
+    }
+  }
+}
+
+class Ball {
+  constructor(x, y, mass) {
+    this.position = createVector(x, y);
+    this.velocity = createVector(0, 0);
+    this.acceleration = createVector(0, 0);
+    this.mass = mass;
+    this.radius = mass * 18;
+    this.damping = 0.75;
+    this.cableX = x;
+  }
+
+  applyForce(force) {
+    let f = p5.Vector.div(force, this.mass);
+    this.acceleration.add(f);
+  }
+
+  update() {
+    this.velocity.add(this.acceleration);
+    this.position.add(this.velocity);
+    this.acceleration.mult(0);
+
+    // siempre alineada al cable
+    this.position.x = this.cableX;
+
+    // suelo
+    if (this.position.y + this.radius > height) {
+      this.position.y = height - this.radius;
+      this.velocity.y *= -this.damping;
+    }
+  }
+
+  display() {
+    noStroke();
+
+    // Paleta minimalista tipo escultura
+    if (this.mass > 1.4) {
+      fill(200, 30, 30); 
+    } else {
+      fill(0);            
+    }
+
+    ellipse(this.position.x, this.position.y, this.radius * 2);
+  }
+}
+
+````
 
 
+<img width="733" height="593" alt="image" src="https://github.com/user-attachments/assets/a41ddfac-2e7b-475b-bdfc-c1d1d0ffba58" />
+
+
+
+
+<img width="902" height="513" alt="image" src="https://github.com/user-attachments/assets/edab1f8c-73cd-4e64-be91-45366f806411" />
 
 
 
