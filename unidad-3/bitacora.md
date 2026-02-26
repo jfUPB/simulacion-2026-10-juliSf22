@@ -429,10 +429,11 @@ class Sheep {
 
 [View](https://editor.p5js.org/juliSf22/full/S49ufekMr)
 
-[Edit]([https://editor.p5js.org/juliSf22/full/S49ufekMr](https://editor.p5js.org/juliSf22/sketches/S49ufekMr))
+[Edit](https://editor.p5js.org/juliSf22/sketches/S49ufekMr)
 
 
 ## Bitácora de reflexión
+
 
 
 
