@@ -435,9 +435,9 @@ class Sheep {
 ## Bitácora de reflexión
 
 
-que es el marco de movimiento motion 101? : basicamente es el usos de fuersas para realizar movimientos, ejemplo hay una fuerza que impulsa y genera movimientos
+que es el marco de movimiento motion 101? : básicamente es el uso de fuerzas para realizar movimientos, ejemplo, hay una fuerza que impulsa y genera movimientos.
 
-y en cuanto a la relacion de fuerza, aceleracion, velocidad y posicion es justamente esa, hay una fuerza que genera celeracion que a la vez genera velocidad que produce un cambio en la poscicion, probocando justamente un movimiento a partir de fuerzas
+y en cuanto a la relación de fuerza, aceleración, velocidad y posición es justamente esa, hay una fuerza que genera aceleración que a la vez genera velocidad que produce un cambio en la posición, provocando justamente un movimiento a partir de fuerzas.
 
  ````js
 
@@ -550,6 +550,7 @@ class Ball {
 
 
 <img width="902" height="513" alt="image" src="https://github.com/user-attachments/assets/edab1f8c-73cd-4e64-be91-45366f806411" />
+
 
 
 
