@@ -519,10 +519,8 @@ class Ball {
     this.position.add(this.velocity);
     this.acceleration.mult(0);
 
-    // siempre alineada al cable
     this.position.x = this.cableX;
 
-    // suelo
     if (this.position.y + this.radius > height) {
       this.position.y = height - this.radius;
       this.velocity.y *= -this.damping;
@@ -532,7 +530,7 @@ class Ball {
   display() {
     noStroke();
 
-    // Paleta minimalista tipo escultura
+    
     if (this.mass > 1.4) {
       fill(200, 30, 30); 
     } else {
@@ -552,6 +550,7 @@ class Ball {
 
 
 <img width="902" height="513" alt="image" src="https://github.com/user-attachments/assets/edab1f8c-73cd-4e64-be91-45366f806411" />
+
 
 
 
