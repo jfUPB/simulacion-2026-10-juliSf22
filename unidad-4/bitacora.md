@@ -273,6 +273,7 @@ let num = 10;
 let spacing = 50;
 
 let t = 0;
+let n = 0;
 
 let useCos = false;
 
@@ -302,13 +303,16 @@ function draw(){
 
   let leader = emojis[0];
 
+  let perlinOffset = map(noise(n),0,1,-40,40);
+
   if(useCos){
-    leader.position.y = height/2 + cos(t)*80;
+    leader.position.y = height/2 + cos(t)*80 + perlinOffset;
   } else {
-    leader.position.y = height/2 + sin(t)*80;
+    leader.position.y = height/2 + sin(t)*80 + perlinOffset;
   }
 
   t += 0.05;
+  n += 0.01;
 
   if(mouseIsPressed){
     leader.position.y = mouseY;
@@ -357,7 +361,7 @@ class Emoji{
 
     textSize(30);
     textAlign(CENTER,CENTER);
-    text("🐶",this.position.x,this.position.y);
+    text("🐛",this.position.x,this.position.y);
 
   }
 
@@ -418,6 +422,7 @@ function keyPressed(){
 <img width="699" height="406" alt="image" src="https://github.com/user-attachments/assets/96005859-470c-45f6-9d74-b5c5066e502a" />
 
 ## Bitácora de reflexión
+
 
 
 
