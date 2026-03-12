@@ -265,7 +265,7 @@ class Pendulum {
 
 ## Bitácora de aplicación 
 
-````
+````js
 let emojis = [];
 let springs = [];
 
@@ -273,6 +273,8 @@ let num = 10;
 let spacing = 50;
 
 let t = 0;
+
+let useCos = false;
 
 function setup() {
 
@@ -298,28 +300,31 @@ function draw(){
 
   background(20,20,35);
 
-
   let leader = emojis[0];
-  leader.position.y = height/2 + sin(t)*80;
 
-  // actualiza resortes
+  if(useCos){
+    leader.position.y = height/2 + cos(t)*80;
+  } else {
+    leader.position.y = height/2 + sin(t)*80;
+  }
+
+  t += 0.05;
+
+  if(mouseIsPressed){
+    leader.position.y = mouseY;
+  }
+
   for(let s of springs){
     s.update();
     s.display();
   }
 
-  // actualiza emojis
   for(let e of emojis){
     e.update();
     e.display();
   }
 
-  t += 0.05;
-
 }
-
-
-
 
 class Emoji{
 
@@ -337,12 +342,10 @@ class Emoji{
 
   update(){
 
-
     let friction = this.velocity.copy();
     friction.mult(-0.02);
     this.applyForce(friction);
 
-    // integración física
     this.velocity.add(this.acceleration);
     this.position.add(this.velocity);
 
@@ -359,9 +362,6 @@ class Emoji{
   }
 
 }
-
-
-
 
 class Spring{
 
@@ -383,7 +383,6 @@ class Spring{
 
     let stretch = d - this.restLength;
 
-    // ley de Hooke
     force.setMag(-this.k * stretch);
 
     this.b.applyForce(force);
@@ -405,12 +404,21 @@ class Spring{
   }
 
 }
+
+function keyPressed(){
+
+  if(key === "c" || key === "C"){
+    useCos = !useCos;
+  }
+
+}
 ````
-[View](https://editor.p5js.org/juliSf22/full/pdduBOFzy)
+[View](https://editor.p5js.org/juliSf22/full/JFeb8SdI8)
 
 <img width="699" height="406" alt="image" src="https://github.com/user-attachments/assets/96005859-470c-45f6-9d74-b5c5066e502a" />
 
 ## Bitácora de reflexión
+
 
 
 
