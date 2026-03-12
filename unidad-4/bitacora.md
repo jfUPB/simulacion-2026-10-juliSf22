@@ -402,7 +402,11 @@ class Spring{
 }
 ````
 [View](https://editor.p5js.org/juliSf22/full/pdduBOFzy)
+
+<img width="699" height="406" alt="image" src="https://github.com/user-attachments/assets/96005859-470c-45f6-9d74-b5c5066e502a" />
+
 ## Bitácora de reflexión
+
 
 
 
