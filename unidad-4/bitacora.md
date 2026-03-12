@@ -419,9 +419,11 @@ function keyPressed(){
 ````
 [View](https://editor.p5js.org/juliSf22/full/JFeb8SdI8)
 
-<img width="699" height="406" alt="image" src="https://github.com/user-attachments/assets/96005859-470c-45f6-9d74-b5c5066e502a" />
+<img width="559" height="336" alt="image" src="https://github.com/user-attachments/assets/aba4ae0b-ff60-44cc-b693-e49ac8e93d7f" />
+
 
 ## Bitácora de reflexión
+
 
 
 
