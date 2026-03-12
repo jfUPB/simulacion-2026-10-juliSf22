@@ -424,6 +424,14 @@ function keyPressed(){
 
 ## Bitácora de reflexión
 
+### 1. Realiza un diagrama conceptual donde incluyas todos los conceptos que has aprendido en las unidades 1 a 4. Relaciona los conceptos entre ellos. 
+
+<img width="1174" height="762" alt="image" src="https://github.com/user-attachments/assets/95ec8d19-a885-4c3d-9a2b-fa4c67b9cbd8" />
+
+
+### 2. Con todo lo que has aprendido hasta ahora, te voy a pedir que pienses cómo lo podrías aplicar a tu perfil profesional. ¿En dónde ves oportunidades?
+
+para ser sincera no soy fan de la programacion, más que todo porque amo la animacion y siempre asocie la programacoin con cosas aburridas y no tan "bonitas" pero es verdad que estas guias me están demostrando cosas diferentes el arte generativo era algo de lo que no sabia demaciado, por lo que nunca le presté mayor atencion, pero ahora que veo que en verdad el codigo puede hacer cosas tan "vivas" y muchas veces super bonitas he interesantes que me hicieron apreciarlo mejor y ahora si consiedrarlo "arte" aún así no estoy segura como podria mesclarlo en mi area de trabajo más que todo porque lo que pienso hacer sería más enfocado a la animacion pura de personajes no a la simulacion de ropa o cabello por ejemplo ya que ahí si habría una gran oportunidad pero no es algo que me llame del todo, pero si es algo que me puede ayudar en mi perfil profecional y donde puede haber una gran oportunida laboral.
 
 
 
