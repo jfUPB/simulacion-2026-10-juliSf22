@@ -88,91 +88,142 @@ function draw() {
 ## Bitácora de aplicación 
 
 ````
+let emojis = [];
+let springs = [];
 
-let mic;
-let particles = [];
+let num = 10;
+let spacing = 50;
+
+let t = 0;
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
-  
-  mic = new p5.AudioIn();
-  mic.start();
-  
-  background(10);
-}
 
-function draw() {
-  
-  background(10, 20); // efecto de rastro
-  
-  let vol = mic.getLevel();
-  
-  let cantidad = map(vol, 0, 0.2, 0, 20);
-  
-  for (let i = 0; i < cantidad; i++) {
-    particles.push(new Particle(width/2, height/2, vol));
-  }
-  
-  for (let i = particles.length - 1; i >= 0; i--) {
-    particles[i].update();
-    particles[i].display();
-    
-    if (particles[i].life <= 0) {
-      particles.splice(i, 1);
+  createCanvas(800,500);
+
+  for (let i = 0; i < num; i++) {
+
+    let x = 100 + i*spacing;
+    let y = height/2;
+
+    let e = new Emoji(x,y);
+    emojis.push(e);
+
+    if(i > 0){
+      springs.push(new Spring(emojis[i-1], emojis[i], spacing));
     }
+
   }
+
 }
 
-class Particle {
+function draw(){
+
+  background(20,20,35);
+
   
-  constructor(x, y, vol) {
-    this.x = x;
-    this.y = y;
-    
-    this.vx = random(-2, 2);
-    this.vy = random(-2, 2);
-    
-    this.size = random(5, 20) + vol * 200;
-    
-    this.life = 255;
-    
-    this.color = color(
-      random(100,255),
-      random(100,255),
-      random(255),
-      this.life
-    );
+  let leader = emojis[0];
+  leader.position.y = height/2 + sin(t)*80;
+
+  // actualiza resortes
+  for(let s of springs){
+    s.update();
+    s.display();
   }
-  
-  update() {
-    
-    this.x += this.vx;
-    this.y += this.vy;
-    
-    let angle = atan2(mouseY - this.y, mouseX - this.x);
-    
-    this.vx += cos(angle) * 0.01;
-    this.vy += sin(angle) * 0.01;
-    
-    this.life -= 2;
+
+  // actualiza emojis
+  for(let e of emojis){
+    e.update();
+    e.display();
   }
-  
-  display() {
-    
-    noStroke();
-    
-    fill(
-      red(this.color),
-      green(this.color),
-      blue(this.color),
-      this.life
-    );
-    
-    ellipse(this.x, this.y, this.size);
-  }
+
+  t += 0.05;
+
 }
 
+
+
+
+class Emoji{
+
+  constructor(x,y){
+
+    this.position = createVector(x,y);
+    this.velocity = createVector(0,0);
+    this.acceleration = createVector(0,0);
+
+  }
+
+  applyForce(force){
+    this.acceleration.add(force);
+  }
+
+  update(){
+
+    this.velocity.add(this.acceleration);
+    this.velocity.mult(0.95);
+
+    this.position.add(this.velocity);
+
+    this.acceleration.mult(0);
+
+  }
+
+  display(){
+
+    textSize(30);
+    textAlign(CENTER,CENTER);
+    text("🐶",this.position.x,this.position.y);
+
+  }
+
+}
+
+
+// clase Spring
+
+class Spring{
+
+  constructor(a,b,len){
+
+    this.a = a;
+    this.b = b;
+
+    this.restLength = len;
+    this.k = 0.08;
+
+  }
+
+  update(){
+
+    let force = p5.Vector.sub(this.b.position,this.a.position);
+
+    let d = force.mag();
+
+    let stretch = d - this.restLength;
+
+    force.setMag(-this.k * stretch);
+
+    this.b.applyForce(force);
+    this.a.applyForce(p5.Vector.mult(force,-1));
+
+  }
+
+  display(){
+
+    stroke(200);
+
+    line(
+      this.a.position.x,
+      this.a.position.y,
+      this.b.position.x,
+      this.b.position.y
+    );
+
+  }
+
+}
 ````
-
+[View](https://editor.p5js.org/juliSf22/full/pdduBOFzy)
 ## Bitácora de reflexión
+
 
