@@ -298,7 +298,7 @@ function draw(){
 
   background(20,20,35);
 
-  
+
   let leader = emojis[0];
   leader.position.y = height/2 + sin(t)*80;
 
@@ -337,9 +337,13 @@ class Emoji{
 
   update(){
 
-    this.velocity.add(this.acceleration);
-    this.velocity.mult(0.95);
 
+    let friction = this.velocity.copy();
+    friction.mult(-0.02);
+    this.applyForce(friction);
+
+    // integración física
+    this.velocity.add(this.acceleration);
     this.position.add(this.velocity);
 
     this.acceleration.mult(0);
@@ -357,7 +361,7 @@ class Emoji{
 }
 
 
-// clase Spring
+
 
 class Spring{
 
@@ -379,6 +383,7 @@ class Spring{
 
     let stretch = d - this.restLength;
 
+    // ley de Hooke
     force.setMag(-this.k * stretch);
 
     this.b.applyForce(force);
@@ -406,6 +411,7 @@ class Spring{
 <img width="699" height="406" alt="image" src="https://github.com/user-attachments/assets/96005859-470c-45f6-9d74-b5c5066e502a" />
 
 ## Bitácora de reflexión
+
 
 
 
