@@ -24,104 +24,137 @@ pues se genera, y con fuerzas (que se calculan cada frame cada frame) generan mo
 
 
 ````js
-/**
- * Sakura Particles - Nutrición y Ascensión
- * Ciclo: Flor -> Hoja -> Raíz -> Energía del Tronco
- */
-
 let particles = [];
-let mic;
-let tableY;
+let mic, tableY, imgArbol;
 let audioStarted = false;
+let myShader, layer;
+
+// --- SHADERS INTEGRADOS ---
+const vertShader = `
+precision mediump float;
+attribute vec3 aPosition;
+attribute vec2 aTexCoord;
+varying vec2 vTexCoord;
+void main() {
+    vTexCoord = aTexCoord;
+    vec4 positionVec4 = vec4(aPosition, 1.0);
+    positionVec4.xy = positionVec4.xy * 2.0 - 1.0;
+    gl_Position = positionVec4;
+}`;
+
+const fragShader = `
+precision mediump float;
+varying vec2 vTexCoord;
+uniform sampler2D tex0;
+void main() {
+    vec2 uv = vec2(vTexCoord.x, 1.0 - vTexCoord.y);
+    vec4 col = texture2D(tex0, uv);
+    vec4 bloom = vec4(0.0);
+    for(float i = -2.0; i <= 2.0; i++) {
+        for(float j = -2.0; j <= 2.0; j++) {
+            bloom += texture2D(tex0, uv + vec2(i, j) * 0.002);
+        }
+    }
+    bloom /= 25.0;
+    float bright = (col.r + col.g + col.b) / 3.0;
+    if(bright > 0.4) {
+        col += bloom * 0.5;
+    }
+    gl_FragColor = col;
+}`;
+
+function preload() {
+  imgArbol = loadImage('./arbol.png');
+}
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  createCanvas(windowWidth, windowHeight, WEBGL);
+  myShader = createShader(vertShader, fragShader);
+  layer = createGraphics(windowWidth, windowHeight);
+  layer.imageMode(CENTER);
+  layer.textAlign(CENTER, CENTER);
   tableY = height - 100; 
   mic = new p5.AudioIn();
 }
 
 function draw() {
-  // --- FONDO DEGRADADO ---
-  noStroke();
+  if (!imgArbol || imgArbol.width <= 0) return;
+
+  layer.clear();
+  
+  // 1. FONDO
+  layer.noStroke();
   for (let y = 0; y < height; y++) {
     let inter = map(y, 0, height, 0, 1);
     let c = lerpColor(color(180, 120, 200), color(255, 180, 130), inter);
-    stroke(c);
-    line(0, y, width, y);
+    layer.stroke(c);
+    layer.line(0, y, width, y);
   }
 
-  // 1. ÁRBOL CENTRADO
-  drawSakuraTreeCentrado();
+  // 2. ÁRBOL (Dibujado antes de la mesa para que las raíces se vean "dentro")
+  let escala = height * 0.85;
+  layer.image(imgArbol, width / 2, height / 2, escala * (imgArbol.width/imgArbol.height), escala);
 
-  // 2. MESA (Semi-transparente para ver el proceso bajo tierra)
-  noStroke();
-  fill(100, 70, 50, 230); 
-  rect(0, tableY, width, 30);
-  fill(70, 45, 30, 230); 
-  rect(0, tableY + 30, width, 70);
+  // 3. MESA / TIERRA (Con transparencia para ver las hojas pasar por debajo)
+  layer.noStroke();
+  layer.fill(60, 40, 30, 240); // 240 de opacidad para efecto de profundidad
+  layer.rect(0, tableY, width, 150);
 
-  if (!audioStarted) {
-    fill(255, 220);
-    textAlign(CENTER, CENTER);
-    textSize(22);
-    text("🌸 Haz clic para iniciar el ciclo eterno", width / 2, height / 2);
-    return;
-  }
+  // 4. PARTÍCULAS
+  if (audioStarted) {
+    let micLevel = mic.getLevel();
+    let wind = createVector(map(mouseX, 0, width, -0.2, 0.2), 0);
 
-  let micLevel = mic.getLevel();
+    if (random(1) < 0.15) particles.push(new Particle());
 
-  // --- VIENTO (MOUSE) ---
-  let windStrength = map(mouseX, 0, width, -0.15, 0.15);
-  let wind = createVector(windStrength, 0);
-
-  // 4. GENERAR PÉTALOS
-  if (random(1) < 0.12) { 
-    particles.push(new Particle(random(width * 0.15, width * 0.85), random(-50, height * 0.3))); 
-  }
-
-  let gravity = createVector(0, 0.12);
-
-  for (let i = particles.length - 1; i >= 0; i--) {
-    let p = particles[i];
-    
-    if (!p.isFeeding) {
-      p.applyForce(gravity);
-      if (p.pos.y < tableY - 5) p.applyForce(wind);
+    for (let i = particles.length - 1; i >= 0; i--) {
+      let p = particles[i];
       
-      // Salto por sonido
-      if (micLevel > 0.05 && p.pos.y >= tableY - 5) {
-        let jumpPower = map(micLevel, 0.05, 1, -4, -12);
-        let jumpForce = createVector(random(-1.5, 1.5), jumpPower);
-        p.vel.y = 0; 
-        p.applyForce(jumpForce);
-        p.lifespan = min(p.lifespan + 35, 255);
-      }
-    } else {
-      // --- LÓGICA DE ABSORCIÓN ---
-      let rootTarget = createVector(width / 2, height - 10);
-      let distToRoot = dist(p.pos.x, p.pos.y, rootTarget.x, rootTarget.y);
-
-      if (distToRoot > 15) {
-        // Viaje horizontal hacia el centro (bajo la mesa)
-        let steer = p5.Vector.sub(rootTarget, p.pos);
-        steer.setMag(2.5); 
-        p.applyForce(steer);
+      if (!p.isFeeding) {
+        p.applyForce(createVector(0, 0.15)); // Gravedad normal
+        p.applyForce(wind);
+        
+        if (micLevel > 0.05 && p.pos.y >= tableY - 5) {
+          p.vel.y = map(micLevel, 0.05, 1, -4, -15);
+          p.lifespan = 255;
+        }
       } else {
-        // ¡ASCENSIÓN! Sube por el centro del tronco
-        p.vel.x = 0;
-        p.vel.y = -6; // Sube rápido
-        p.size *= 0.9; // Se encoge por la succión
+        // --- LÓGICA SUBTERRÁNEA ---
+        let centroTronco = width / 2;
+        let distAlCentro = centroTronco - p.pos.x;
+        
+        // 1. Bajar a la tierra: Si aún no está "profunda", forzar caída
+        if (p.pos.y < tableY + 40) {
+            p.vel.y = 2; 
+        } else {
+            p.vel.y *= 0.1; // Se detiene verticalmente para viajar horizontal
+        }
+
+        // 2. Viaje horizontal al centro
+        p.vel.x += distAlCentro * 0.04;
+        p.vel.x *= 0.8; 
+        
+        // 3. Ascenso por el tronco
+        if (abs(distAlCentro) < 15 && p.pos.y > tableY + 20) {
+            p.pos.x = centroTronco; 
+            p.vel.y = -8; // ¡Sube!
+            p.size *= 0.94; 
+        }
       }
-    }
 
-    p.update();
-    p.checkSurface(tableY);
-    p.show();
-
-    if (p.isDead()) {
-      particles.splice(i, 1);
+      p.update();
+      p.show(layer);
+      if (p.isDead()) particles.splice(i, 1);
     }
+  } else {
+    layer.fill(255);
+    layer.textSize(32);
+    layer.text("🌸 Click para iniciar", width/2, height/2);
   }
+
+  shader(myShader);
+  myShader.setUniform('tex0', layer);
+  rect(-width / 2, -height / 2, width, height);
 }
 
 function mousePressed() {
@@ -132,197 +165,202 @@ function mousePressed() {
   }
 }
 
-function drawSakuraTreeCentrado() {
-  push();
-  noFill();
-  stroke(65, 40, 30); 
-  strokeCap(ROUND);
-  strokeJoin(ROUND);
-  strokeWeight(30);
-  bezier(width * 0.5, height, width * 0.52, height * 0.7, width * 0.48, height * 0.4, width * 0.5, height * 0.1);
-  strokeWeight(20);
-  bezier(width * 0.51, height * 0.65, width * 0.4, height * 0.62, width * 0.2, height * 0.65, width * 0.1, height * 0.55);
-  strokeWeight(15);
-  bezier(width * 0.49, height * 0.45, width * 0.35, height * 0.42, width * 0.25, height * 0.35, width * 0.15, height * 0.25);
-  strokeWeight(12);
-  bezier(width * 0.5, height * 0.25, width * 0.42, height * 0.2, width * 0.35, height * 0.15, width * 0.3, height * -0.05);
-  strokeWeight(20);
-  bezier(width * 0.49, height * 0.68, width * 0.6, height * 0.65, width * 0.8, height * 0.62, width * 0.9, height * 0.52);
-  strokeWeight(15);
-  bezier(width * 0.51, height * 0.48, width * 0.65, height * 0.45, width * 0.75, height * 0.38, width * 0.85, height * 0.3);
-  strokeWeight(12);
-  bezier(width * 0.5, height * 0.3, width * 0.58, height * 0.25, width * 0.65, height * 0.2, width * 0.7, height * -0.1);
-  strokeWeight(7);
-  bezier(width * 0.25, height * 0.6, width * 0.2, height * 0.55, width * 0.18, height * 0.6, width * 0.1, height * 0.5);
-  bezier(width * 0.75, height * 0.42, width * 0.8, height * 0.45, width * 0.82, height * 0.38, width * 0.9, height * 0.4);
-  pop();
-}
-
 class Particle {
-  constructor(x, y) {
-    this.pos = createVector(x, y);
-    this.vel = createVector(random(-0.5, 0.5), random(0, 1.5));
+  constructor() {
+    this.pos = createVector(random(width * 0.1, width * 0.9), random(-50, height * 0.4));
+    this.vel = createVector(random(-1, 1), random(1, 2));
     this.acc = createVector(0, 0);
     this.lifespan = 255;
-    this.decayRate = random(0.5, 1.5);
-    this.currentEmoji = '🌸';
     this.size = random(20, 35);
-    this.rotation = random(TWO_PI);
-    this.rotSpeed = random(-0.05, 0.05);
+    this.emoji = '🌸';
     this.isFeeding = false;
+    this.rot = random(TWO_PI);
   }
 
-  applyForce(force) {
-    this.acc.add(force);
-  }
+  applyForce(f) { this.acc.add(f); }
 
   update() {
     this.vel.add(this.acc);
     this.pos.add(this.vel);
     this.acc.mult(0);
 
+    // Si es flor, rebota. Si es hoja, ignora el rebote para "enterrarse"
     if (!this.isFeeding) {
-      if (this.pos.y < tableY) {
-        this.rotation += this.rotSpeed + (this.vel.x * 0.05);
-      }
-
-      if (this.pos.y >= tableY - 1) {
-        this.lifespan -= this.decayRate * 3.0;
-        this.vel.x *= 0.85; 
-
-        if (this.lifespan < 140) {
-          this.currentEmoji = '🍂';
-          this.isFeeding = true; 
+        if (this.pos.y >= tableY) {
+            this.pos.y = tableY;
+            this.vel.y *= -0.1;
+            this.lifespan -= 3;
+            if (this.lifespan < 160) {
+                this.emoji = '🍂';
+                this.isFeeding = true;
+            }
         }
-      } else {
-        this.lifespan -= this.decayRate;
-      }
+        this.rot += 0.05;
     } else {
-      // Girar rápido mientras es absorbido
-      this.rotation += 0.1;
-      this.lifespan -= 2;
+        this.lifespan -= 1.5;
+        this.rot += 0.02;
     }
   }
 
-  checkSurface(surfaceY) {
-    if (!this.isFeeding) {
-      if (this.pos.y >= surfaceY) {
-        this.pos.y = surfaceY;
-        this.vel.y *= -0.1;
-      }
-    }
-  }
-
-  show() {
-    push();
-    translate(this.pos.x, this.pos.y);
-    rotate(this.rotation);
+  show(c) {
+    c.push();
+    c.translate(this.pos.x, this.pos.y);
+    c.rotate(this.rot);
     
-    let alphaVal = map(this.lifespan, 0, 255, 0, 255);
-    
-    // Si está bajo la mesa, se ve más "fantasmagórico"
+    // Si está bajo tierra, se ve más oscura y transparente
+    let alpha = this.isFeeding ? map(this.lifespan, 0, 160, 0, 180) : this.lifespan;
     if (this.isFeeding && this.pos.y > tableY) {
-      alphaVal *= 0.5;
+        c.fill(100, 50, 50, alpha); // Tono tierra
+    } else {
+        c.fill(255, alpha);
     }
-
-    fill(255, alphaVal);
-    textAlign(CENTER, CENTER);
-    textSize(this.size);
-    text(this.currentEmoji, 0, 0);
-    pop();
+    
+    c.textSize(this.size);
+    c.text(this.emoji, 0, 0);
+    c.pop();
   }
 
   isDead() {
-    // Muere si se queda sin vida o se vuelve minúsculo al subir
-    return this.lifespan <= 0 || this.size < 3 || this.pos.y < -50;
+    // Si ya subió más allá de la pantalla después de alimentar, muere
+    return this.lifespan <= 0 || (this.isFeeding && this.pos.y < -150);
   }
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  layer = createGraphics(windowWidth, windowHeight);
 }
 ````
 
 ````js
-/**
- * Sakura Particles - Ciclo de Vida: Flor a Hoja
- * Interacción: Micrófono (Salto) + Mouse (Viento)
- */
-
 let particles = [];
-let mic;
-let tableY;
+let mic, tableY, imgArbol;
 let audioStarted = false;
+let myShader, layer;
+
+// --- SHADERS INTEGRADOS ---
+const vertShader = `
+precision mediump float;
+attribute vec3 aPosition;
+attribute vec2 aTexCoord;
+varying vec2 vTexCoord;
+void main() {
+    vTexCoord = aTexCoord;
+    vec4 positionVec4 = vec4(aPosition, 1.0);
+    positionVec4.xy = positionVec4.xy * 2.0 - 1.0;
+    gl_Position = positionVec4;
+}`;
+
+const fragShader = `
+precision mediump float;
+varying vec2 vTexCoord;
+uniform sampler2D tex0;
+void main() {
+    vec2 uv = vec2(vTexCoord.x, 1.0 - vTexCoord.y);
+    vec4 col = texture2D(tex0, uv);
+    vec4 bloom = vec4(0.0);
+    for(float i = -2.0; i <= 2.0; i++) {
+        for(float j = -2.0; j <= 2.0; j++) {
+            bloom += texture2D(tex0, uv + vec2(i, j) * 0.002);
+        }
+    }
+    bloom /= 25.0;
+    float bright = (col.r + col.g + col.b) / 3.0;
+    if(bright > 0.4) {
+        col += bloom * 0.5;
+    }
+    gl_FragColor = col;
+}`;
+
+function preload() {
+  imgArbol = loadImage('./arbol.png');
+}
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  createCanvas(windowWidth, windowHeight, WEBGL);
+  myShader = createShader(vertShader, fragShader);
+  layer = createGraphics(windowWidth, windowHeight);
+  layer.imageMode(CENTER);
+  layer.textAlign(CENTER, CENTER);
   tableY = height - 100; 
   mic = new p5.AudioIn();
 }
 
 function draw() {
-  // --- FONDO DEGRADADO ---
-  noStroke();
+  if (!imgArbol || imgArbol.width <= 0) return;
+
+  layer.clear();
+  
+  // 1. FONDO
+  layer.noStroke();
   for (let y = 0; y < height; y++) {
     let inter = map(y, 0, height, 0, 1);
     let c = lerpColor(color(180, 120, 200), color(255, 180, 130), inter);
-    stroke(c);
-    line(0, y, width, y);
+    layer.stroke(c);
+    layer.line(0, y, width, y);
   }
 
-  // 1. ÁRBOL CENTRADO
-  drawSakuraTreeCentrado();
+  // 2. ÁRBOL
+  let escala = height * 0.85;
+  layer.image(imgArbol, width / 2, height / 2, escala * (imgArbol.width/imgArbol.height), escala);
 
-  // 2. MESA
-  noStroke();
-  fill(100, 70, 50); 
-  rect(0, tableY, width, 30);
-  fill(70, 45, 30); 
-  rect(0, tableY + 30, width, 70);
+  // 3. MESA
+  layer.noStroke();
+  layer.fill(60, 40, 30);
+  layer.rect(0, tableY, width, 100);
 
-  if (!audioStarted) {
-    fill(255, 220);
-    textAlign(CENTER, CENTER);
-    textSize(22);
-    text("🌸 Haz clic para activar el micrófono y el viento", width / 2, height / 2);
-    return;
-  }
+  // 4. PARTÍCULAS
+  if (audioStarted) {
+    let micLevel = mic.getLevel();
+    let wind = createVector(map(mouseX, 0, width, -0.2, 0.2), 0);
 
-  let micLevel = mic.getLevel();
+    if (random(1) < 0.15) particles.push(new Particle());
 
-  // --- VIENTO (MOUSE) ---
-  let windStrength = map(mouseX, 0, width, -0.15, 0.15);
-  let wind = createVector(windStrength, 0);
-
-  // 4. GENERAR PÉTALOS
-  if (random(1) < 0.12) { 
-    particles.push(new Particle(random(width * 0.15, width * 0.85), random(-50, height * 0.4))); 
-  }
-
-  let gravity = createVector(0, 0.12);
-
-  for (let i = particles.length - 1; i >= 0; i--) {
-    let p = particles[i];
-    p.applyForce(gravity);
-    
-    if (p.pos.y < tableY - 5) {
-      p.applyForce(wind);
-    }
-
-    if (micLevel > 0.05) { 
-      if (p.pos.y >= tableY - 5) {
-        let jumpPower = map(micLevel, 0.05, 1, -4, -12);
-        let jumpForce = createVector(random(-1.5, 1.5), jumpPower);
-        p.vel.y = 0; 
-        p.applyForce(jumpForce);
-        p.lifespan = min(p.lifespan + 30, 255);
+    for (let i = particles.length - 1; i >= 0; i--) {
+      let p = particles[i];
+      
+      if (!p.isFeeding) {
+        p.applyForce(createVector(0, 0.15)); // Gravedad normal
+        p.applyForce(wind);
+        
+        // Salto por mic
+        if (micLevel > 0.05 && p.pos.y >= tableY - 5) {
+          p.vel.y = map(micLevel, 0.05, 1, -4, -15);
+          p.lifespan = 255;
+        }
+      } else {
+        // --- LÓGICA DE ABSORCIÓN REFORZADA ---
+        let centroTronco = width / 2;
+        let distAlCentro = centroTronco - p.pos.x;
+        
+        // Atracción horizontal fuerte al centro
+        let fuerzaAtraccion = distAlCentro * 0.05;
+        p.vel.x += fuerzaAtraccion;
+        p.vel.x *= 0.8; // Fricción para que no "orbite" y se quede en el centro
+        
+        // Si ya está centrada, empieza a subir
+        if (abs(distAlCentro) < 20) {
+            p.pos.x = lerp(p.pos.x, centroTronco, 0.1); // Forzar posición al centro
+            p.vel.y = -6; // Sube
+            p.size *= 0.95; // Se encoge
+        } else {
+            p.vel.y *= 0.5; // Se frena en Y mientras llega al centro
+        }
       }
-    }
 
-    p.update();
-    p.checkSurface(tableY);
-    p.show();
-
-    if (p.isDead()) {
-      particles.splice(i, 1);
+      p.update();
+      p.show(layer);
+      if (p.isDead()) particles.splice(i, 1);
     }
+  } else {
+    layer.fill(255);
+    layer.textSize(32);
+    layer.text("🌸 Click para iniciar", width/2, height/2);
   }
+
+  shader(myShader);
+  myShader.setUniform('tex0', layer);
+  rect(-width / 2, -height / 2, width, height);
 }
 
 function mousePressed() {
@@ -333,101 +371,59 @@ function mousePressed() {
   }
 }
 
-function drawSakuraTreeCentrado() {
-  push();
-  noFill();
-  stroke(65, 40, 30); 
-  strokeCap(ROUND);
-  strokeJoin(ROUND);
-  strokeWeight(30);
-  bezier(width * 0.5, height, width * 0.52, height * 0.7, width * 0.48, height * 0.4, width * 0.5, height * 0.1);
-  strokeWeight(20);
-  bezier(width * 0.51, height * 0.65, width * 0.4, height * 0.62, width * 0.2, height * 0.65, width * 0.1, height * 0.55);
-  strokeWeight(15);
-  bezier(width * 0.49, height * 0.45, width * 0.35, height * 0.42, width * 0.25, height * 0.35, width * 0.15, height * 0.25);
-  strokeWeight(12);
-  bezier(width * 0.5, height * 0.25, width * 0.42, height * 0.2, width * 0.35, height * 0.15, width * 0.3, height * -0.05);
-  strokeWeight(20);
-  bezier(width * 0.49, height * 0.68, width * 0.6, height * 0.65, width * 0.8, height * 0.62, width * 0.9, height * 0.52);
-  strokeWeight(15);
-  bezier(width * 0.51, height * 0.48, width * 0.65, height * 0.45, width * 0.75, height * 0.38, width * 0.85, height * 0.3);
-  strokeWeight(12);
-  bezier(width * 0.5, height * 0.3, width * 0.58, height * 0.25, width * 0.65, height * 0.2, width * 0.7, height * -0.1);
-  strokeWeight(7);
-  bezier(width * 0.25, height * 0.6, width * 0.2, height * 0.55, width * 0.18, height * 0.6, width * 0.1, height * 0.5);
-  bezier(width * 0.75, height * 0.42, width * 0.8, height * 0.45, width * 0.82, height * 0.38, width * 0.9, height * 0.4);
-  pop();
-}
-
-// --- CLASE PARTÍCULA CON METAMORFOSIS ---
 class Particle {
-  constructor(x, y) {
-    this.pos = createVector(x, y);
-    this.vel = createVector(random(-0.5, 0.5), random(0, 1.5));
+  constructor() {
+    this.pos = createVector(random(width * 0.1, width * 0.9), random(-50, height * 0.4));
+    this.vel = createVector(random(-1, 1), random(1, 2));
     this.acc = createVector(0, 0);
     this.lifespan = 255;
-    this.decayRate = random(0.4, 1.2);
-    this.currentEmoji = '🌸'; // Todas nacen siendo flores
-    this.size = random(20, 38);
-    this.rotation = random(TWO_PI);
-    this.rotSpeed = random(-0.04, 0.04);
+    this.size = random(20, 35);
+    this.emoji = '🌸';
+    this.isFeeding = false;
+    this.rot = random(TWO_PI);
   }
 
-  applyForce(force) {
-    this.acc.add(force);
-  }
+  applyForce(f) { this.acc.add(f); }
 
   update() {
     this.vel.add(this.acc);
     this.pos.add(this.vel);
     this.acc.mult(0);
 
-    if (this.pos.y < tableY) {
-      this.rotation += this.rotSpeed + (this.vel.x * 0.05);
-    }
-
-    // Lógica de transformación en la mesa
-    if (this.pos.y >= tableY - 1) {
-      this.lifespan -= this.decayRate * 3.5;
-      this.vel.x *= 0.85; 
-
-      // Si la vida baja de cierto punto en el suelo, se vuelve hoja
-      if (this.lifespan < 120) {
-        this.currentEmoji = '🍂';
+    if (this.pos.y >= tableY) {
+      if (!this.isFeeding) {
+        this.pos.y = tableY;
+        this.vel.y *= -0.1;
       }
-    } else {
-      this.lifespan -= this.decayRate;
-      this.vel.x *= 0.99;
+      this.lifespan -= 2.5;
+      if (this.lifespan < 160) {
+        this.emoji = '🍂';
+        this.isFeeding = true;
+      }
+    } else if (!this.isFeeding) {
+      this.rot += 0.05;
     }
   }
 
-  checkSurface(surfaceY) {
-    if (this.pos.y >= surfaceY) {
-      this.pos.y = surfaceY;
-      this.vel.y *= -0.1;
-    }
-  }
-
-  show() {
-    push();
-    translate(this.pos.x, this.pos.y);
-    rotate(this.rotation);
-    
-    let alphaVal = 255;
-    if (this.lifespan < 60) {
-      alphaVal = map(this.lifespan, 0, 60, 0, 255);
-    }
-    
-    fill(255, alphaVal);
-    textAlign(CENTER, CENTER);
-    textSize(this.size);
-    text(this.currentEmoji, 0, 0);
-    pop();
+  show(c) {
+    c.push();
+    c.translate(this.pos.x, this.pos.y);
+    c.rotate(this.rot);
+    let a = this.isFeeding ? map(this.lifespan, 0, 160, 0, 255) : this.lifespan;
+    c.fill(255, a);
+    c.textSize(this.size);
+    c.text(this.emoji, 0, 0);
+    c.pop();
   }
 
   isDead() {
-    return this.lifespan <= 0;
+    return this.lifespan <= 0 || this.size < 2 || this.pos.y < -100;
   }
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  layer = createGraphics(windowWidth, windowHeight);
 }
 ````
 [editar](https://editor.p5js.org/juliSf22/sketches/I-X0Jiq7-)
