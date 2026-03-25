@@ -23,7 +23,7 @@ pues se genera, y con fuerzas (que se calculan cada frame cada frame) generan mo
 <img width="966" height="584" alt="image" src="https://github.com/user-attachments/assets/7cdea1b6-d202-4f84-95c7-f1a0dda0a0c6" />
 
 
-[editar](https://editor.p5js.org/juliSf22/sketches/I-X0Jiq7-)
-[ver](https://editor.p5js.org/juliSf22/full/I-X0Jiq7-)
+[editar](https://editor.p5js.org/juliSf22/sketches/28kmEcal5)
+[ver](https://editor.p5js.org/juliSf22/full/28kmEcal5)
 
 ## Bitácora de reflexión
