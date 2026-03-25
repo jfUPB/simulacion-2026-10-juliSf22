@@ -41,9 +41,9 @@ para la ultima fase de transformacion se convierten en hojas, reprecentando como
 
 **por qué un arbol?** es un ejemplo muy lindo de la vida, aparte que se ve super lindo, obviamente las particulas tenddrían que ser emojis de flores de cerezo
 
-**fuerzas e interacion:** la gravedad obviamente para que caigan y emulen un poco la vida real, aparte de una fuerza cuando arrastres el mouse simulando un brisa o el viento, tambien pues cuando alquien "pise" muy duro el suelo que hace que se levanten un poco lás hojas del suelo.
+**fuerzas e interaccion:** la gravedad obviamente para que caigan y emulen un poco la vida real, aparte de una fuerza cuando arrastres el mouse simulando un brisa o el viento, tambien pues cuando alquien "pise" muy duro el suelo que hace que se levanten un poco lás hojas del suelo.
 
-**ParticuleLife:** la particula tiene diferentes comportamientos a lo largo de este proyecto, por lo que lo voy a dividir para mejor explicacion:
+**ParticleLife:** la particula tiene diferentes comportamientos a lo largo de este proyecto, por lo que lo voy a dividir para mejor explicacion:
 
 - flores: caen y se transforma en hojas despues de un tiempo
 - hojas: bajan un poco, van hacia el centro del arbol donde empiezan a subir mientras lentamente se hacen más pequeñas hasta desaparecer
@@ -59,5 +59,6 @@ para la ultima fase de transformacion se convierten en hojas, reprecentando como
 
 [editar](https://editor.p5js.org/juliSf22/sketches/28kmEcal5)
 [ver](https://editor.p5js.org/juliSf22/full/28kmEcal5)
+
 
 ## Bitácora de reflexión
