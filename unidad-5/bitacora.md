@@ -20,6 +20,33 @@ pues se genera, y con fuerzas (que se calculan cada frame cada frame) generan mo
 
 ## Bitácora de aplicación 
 
+### Fase1: 
+en la priemera fase queria que se vea un arbol de cerezo que lentamente vaya soltando florecitas(particulas) que cahen he interactuan con el suelo, ya que tienen fisicas
+
+### Fase2:
+
+una vez caen pueden tener diferentes interacciones como lo es el viento y un golpe que las levanta "como lo harian en la vida real" luego de un tiempito estas se transforman entrando a la fase3
+
+### Fase3:
+
+para la ultima fase de transformacion se convierten en hojas, reprecentando como cuando se marchitan las flores y una vez marchitas estas entran en la tierra para luego subir y darle nutrientes al arbol para continuar el cilo.
+
+
+
+### Mapa De Deciciones:
+
+**por qué un arbol?** es un ejemplo muy lindo de la vida, aparte que se ve super lindo, obviamente las particulas tenddrían que ser emojis de flores de cerezo
+
+**fuerzas:** la gravedad obviamente para que caigan y emulen un poco la vida real, aparte de una fuerza cuando arrastres el mouse simulando un brisa o el viento, tambien pues cuando alquien "pise" muy duro el suelo que hace que se levanten un poco lás hojas del suelo.
+
+**ParticuleLife** la particula tiene diferentes comportamientos a lo largo de este proyecto, 
+
+
+
+
+
+
+
 <img width="966" height="584" alt="image" src="https://github.com/user-attachments/assets/7cdea1b6-d202-4f84-95c7-f1a0dda0a0c6" />
 
 
