@@ -20,6 +20,9 @@ pues se genera, y con fuerzas (que se calculan cada frame cada frame) generan mo
 
 ## Bitácora de aplicación 
 
+<img width="966" height="584" alt="image" src="https://github.com/user-attachments/assets/7cdea1b6-d202-4f84-95c7-f1a0dda0a0c6" />
+
+
 ### Fase1: 
 en la priemera fase queria que se vea un arbol de cerezo que lentamente vaya soltando florecitas(particulas) que cahen he interactuan con el suelo, ya que tienen fisicas
 
@@ -33,21 +36,25 @@ para la ultima fase de transformacion se convierten en hojas, reprecentando como
 
 
 
+
 ### Mapa De Deciciones:
 
 **por qué un arbol?** es un ejemplo muy lindo de la vida, aparte que se ve super lindo, obviamente las particulas tenddrían que ser emojis de flores de cerezo
 
-**fuerzas:** la gravedad obviamente para que caigan y emulen un poco la vida real, aparte de una fuerza cuando arrastres el mouse simulando un brisa o el viento, tambien pues cuando alquien "pise" muy duro el suelo que hace que se levanten un poco lás hojas del suelo.
+**fuerzas e interacion:** la gravedad obviamente para que caigan y emulen un poco la vida real, aparte de una fuerza cuando arrastres el mouse simulando un brisa o el viento, tambien pues cuando alquien "pise" muy duro el suelo que hace que se levanten un poco lás hojas del suelo.
 
-**ParticuleLife** la particula tiene diferentes comportamientos a lo largo de este proyecto, 
+**ParticuleLife:** la particula tiene diferentes comportamientos a lo largo de este proyecto, por lo que lo voy a dividir para mejor explicacion:
+
+- flores: caen y se transforma en hojas despues de un tiempo
+- hojas: bajan un poco, van hacia el centro del arbol donde empiezan a subir mientras lentamente se hacen más pequeñas hasta desaparecer
+
+**Shaders:** el shader solo afectará a las hojas porque es una especie de retroalimentacion visual de que dan "nutrientes" o revitalizan el arbol
+
+**otros efectos:** en otros efectos están el hecho de que cuando desaparecen/mueren las particulas de las hojas hay una especie de luz en el arbol para enfatizar la narrativa.
+
+**por qué esa condicion de muerte** porque cierra muy bien el ciclo, es un arbol que se autosostiene, esta condicion de muerte de las particulas mesclada con el cambio hacen que se entienda el mensaje o la intencion que tengo.
 
 
-
-
-
-
-
-<img width="966" height="584" alt="image" src="https://github.com/user-attachments/assets/7cdea1b6-d202-4f84-95c7-f1a0dda0a0c6" />
 
 
 [editar](https://editor.p5js.org/juliSf22/sketches/28kmEcal5)
