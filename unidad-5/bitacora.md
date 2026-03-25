@@ -61,4 +61,6 @@ para la ultima fase de transformacion se convierten en hojas, reprecentando como
 [ver](https://editor.p5js.org/juliSf22/full/28kmEcal5)
 
 
+
+
 ## Bitácora de reflexión
