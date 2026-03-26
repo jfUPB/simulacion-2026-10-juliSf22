@@ -486,7 +486,8 @@ function windowResized() {
 
 ¿Qué se mantendría igual y qué cambiaría? ¿Qué partes de tu diseño son independientes de la herramienta?
 
-unity: no sabria hacerlo ni con IA :c
-Blender: quedaria más chido
+- unity: no sabria hacerlo ni con IA :c
+
+- Blender: quedaria más chido
 
 pero en genral la idea no depende del programa en cualquiera se podria representar la misma narrativa solo que con una "skin diferente"
