@@ -72,16 +72,24 @@ Se mantiene igual la parte de estructura y la base del comportamiento. Lo que ca
 
 ### Actividad 4:
 
-¿Dónde se define la gravedad y quién la aplica? ¿Es global o local?**
+¿Dónde se define la gravedad y quién la aplica? ¿Es global o local?:
+
+
  La gravedad se define en el entorno principal. El sistema de partículas se encarga de aplicarla a cada partícula. Es una fuerza global porque afecta a todas por igual.
 
-¿Qué diferencia hay entre la gravedad y el repeller?**
+¿Qué diferencia hay entre la gravedad y el repeller?:
+
+
  La gravedad es constante y viene del entorno general. El repeller está en su propia clase y calcula la fuerza dependiendo de la posición de cada partícula. Por eso la gravedad es global y el repeller es local.
 
-¿Qué principio físico se está modelando?**
+¿Qué principio físico se está modelando?:
+
+
  Se basa en una relación donde la fuerza depende de la distancia, más cerca es más fuerte. Es como la Ley de Gravitación Universal de Newton.
 
-¿Cambió la clase Particle entre 4.6 y 4.7? ¿Qué implica?**
+¿Cambió la clase Particle entre 4.6 y 4.7? ¿Qué implica?: 
+
+
  No cambió. Eso significa que la partícula está separada de las fuerzas. Solo recibe vectores y los aplica, sin importar de dónde vienen.
 
 ---
@@ -98,16 +106,24 @@ Se mantiene igual la parte de estructura y la base del comportamiento. Lo que ca
 | ¿Cómo mueren?           | lifespan ≤ 0 | lifespan ≤ 0 | lifespan ≤ 0 | lifespan ≤ 0 | lifespan ≤ 0 |
 
 ---
-¿Qué cambiaste?**
+¿Qué cambiaste?:
+
+
  Solo cambié la dirección del vector en el repeller, multiplicándolo por -1.
 
-¿Qué modificaste?**
+¿Qué modificaste?:
+
+
  Solo el método del repeller que calcula la fuerza.
 
-¿Qué no tocaste?**
+¿Qué no tocaste?:
+
+
  No cambié ni la partícula, ni el sistema, ni el draw().
 
-¿Por qué funcionó sin romper todo?**
+¿Por qué funcionó sin romper todo?: 
+
+
  Porque cada parte está separada. El repeller solo manda una fuerza, y el resto del sistema la usa igual sin importar cómo se calculó.
 
 
