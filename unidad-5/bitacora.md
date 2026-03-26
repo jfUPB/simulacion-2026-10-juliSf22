@@ -16,7 +16,7 @@ el tiempo de vida, so esto se mescla con el cambio en la opacidad de la misma pa
 
 pues se genera, y con fuerzas (que se calculan cada frame cada frame) generan movimiento
 
-
+[editar](https://editor.p5js.org/juliSf22/sketches/28kmEcal5)
 
 ## Bitácora de aplicación 
 
@@ -54,12 +54,292 @@ para la ultima fase de transformacion se convierten en hojas, reprecentando como
 
 **por qué esa condicion de muerte** porque cierra muy bien el ciclo, es un arbol que se autosostiene, esta condicion de muerte de las particulas mesclada con el cambio hacen que se entienda el mensaje o la intencion que tengo.
 
+````js
+let particles = [];
+let mic, tableY, imgArbol;
+let audioStarted = false;
+let myShader, layer, glowLayer;
 
 
+let lastSpawn = 0;
+let spawnInterval = 1000;
 
-[editar](https://editor.p5js.org/juliSf22/sketches/28kmEcal5)
+
+let windForce = 0;
+
+
+let treeFlash = 0;
+
+
+const vertShader = `
+precision mediump float;
+attribute vec3 aPosition;
+attribute vec2 aTexCoord;
+varying vec2 vTexCoord;
+void main() {
+    vTexCoord = aTexCoord;
+    vec4 positionVec4 = vec4(aPosition, 1.0);
+    positionVec4.xy = positionVec4.xy * 2.0 - 1.0;
+    gl_Position = positionVec4;
+}`;
+
+const fragShader = `
+precision mediump float;
+varying vec2 vTexCoord;
+uniform sampler2D tex0;
+void main() {
+    vec2 uv = vec2(vTexCoord.x, 1.0 - vTexCoord.y);
+    vec4 col = texture2D(tex0, uv);
+    vec4 bloom = vec4(0.0);
+    for(float i = -2.0; i <= 2.0; i++) {
+        for(float j = -2.0; j <= 2.0; j++) {
+            bloom += texture2D(tex0, uv + vec2(i, j) * 0.002);
+        }
+    }
+    bloom /= 25.0;
+    gl_FragColor = col + bloom * 1.5;
+}`;
+
+function preload() {
+  imgArbol = loadImage('./arbol.png');
+}
+
+function setup() {
+  createCanvas(windowWidth, windowHeight, WEBGL);
+  myShader = createShader(vertShader, fragShader);
+
+  layer = createGraphics(windowWidth, windowHeight);
+  glowLayer = createGraphics(windowWidth, windowHeight);
+
+  layer.imageMode(CENTER);
+  layer.textAlign(CENTER, CENTER);
+  glowLayer.textAlign(CENTER, CENTER);
+
+  tableY = height - 100;
+  mic = new p5.AudioIn();
+}
+
+function draw() {
+  if (!imgArbol || imgArbol.width <= 0) return;
+
+  layer.clear();
+  glowLayer.clear();
+
+  // FONDO
+  for (let y = 0; y < height; y++) {
+    let inter = map(y, 0, height, 0, 1);
+    let c = lerpColor(color(180, 120, 200), color(255, 180, 130), inter);
+    layer.stroke(c);
+    layer.line(0, y, width, y);
+  }
+
+  // ÁRBOL
+  let escala = height * 0.85;
+  layer.image(imgArbol, width / 2, height / 2, escala * (imgArbol.width/imgArbol.height), escala);
+
+  // ✨ FLASH SUAVE (SIN BORDES DUROS)
+  if (treeFlash > 0) {
+    layer.noStroke();
+
+    let maxR = escala * 0.6;
+
+    for (let i = 0; i < 5; i++) {
+      let r = map(i, 0, 4, maxR * 0.2, maxR);
+      let alpha = map(i, 0, 4, treeFlash, 0);
+
+      layer.fill(255, 220, 180, alpha * 0.4);
+      layer.ellipse(width/2, height/2, r);
+    }
+
+    treeFlash *= 0.9; // más suave
+  }
+
+  // SUELO
+  layer.noStroke();
+  layer.fill(60, 40, 30);
+  layer.rect(0, tableY, width, 100);
+
+  if (audioStarted) {
+    let micLevel = mic.getLevel();
+    let wind = createVector(windForce, 0);
+
+    if (millis() - lastSpawn > spawnInterval) {
+      particles.push(new Particle());
+      lastSpawn = millis();
+      spawnInterval = random(900, 1600);
+    }
+
+    for (let i = particles.length - 1; i >= 0; i--) {
+      let p = particles[i];
+
+      if (!p.isFeeding) {
+        p.applyForce(createVector(0, 0.15));
+        p.applyForce(wind);
+
+        if (micLevel > 0.05 && p.pos.y >= tableY - 5) {
+          p.vel.y = map(micLevel, 0.05, 1, -4, -15);
+          p.lifespan = 255;
+        }
+      } else {
+        let centro = width / 2;
+
+        if (!p.hasDropped) {
+          p.vel.y = 2;
+          p.dropTimer--;
+          if (p.dropTimer <= 0) p.hasDropped = true;
+        } else {
+          let dx = centro - p.pos.x;
+          p.vel.x += dx * 0.05;
+          p.vel.x *= 0.8;
+
+          if (abs(dx) < 20) {
+            p.pos.x = lerp(p.pos.x, centro, 0.2);
+            p.vel.y = -6;
+            p.size *= 0.95;
+            p.fade *= 0.94;
+          } else {
+            p.vel.y *= 0.5;
+          }
+        }
+      }
+
+      p.update();
+
+      if (p.isFeeding) {
+        p.show(glowLayer);
+      } else {
+        p.show(layer);
+      }
+
+      // FLASH MÁS SUTIL
+      if (p.isDead()) {
+        treeFlash = 80; // antes 150 → ahora más suave
+        particles.splice(i, 1);
+      }
+    }
+  } else {
+    layer.fill(255);
+    layer.textSize(32);
+    layer.text("🌸 Click para iniciar", width/2, height/2);
+  }
+
+  resetShader();
+  image(layer, -width/2, -height/2);
+
+  shader(myShader);
+  myShader.setUniform('tex0', glowLayer);
+  rect(-width/2, -height/2, width, height);
+}
+
+function mousePressed() {
+  if (!audioStarted) {
+    userStartAudio();
+    mic.start();
+    audioStarted = true;
+  }
+}
+
+function mouseDragged() {
+  windForce = movedX * 0.02;
+}
+
+function mouseReleased() {
+  windForce = 0;
+}
+
+class Particle {
+  constructor() {
+    this.pos = createVector(
+      random(width * 0.3, width * 0.7),
+      random(height * 0.25, height * 0.45)
+    );
+
+    this.vel = createVector(random(-1, 1), random(1, 2));
+    this.acc = createVector(0, 0);
+    this.lifespan = 255;
+    this.size = random(20, 35);
+    this.fade = 1;
+
+    this.emoji = '🌸';
+    this.isFeeding = false;
+    this.rot = random(TWO_PI);
+
+    this.hasDropped = false;
+    this.dropTimer = 20;
+  }
+
+  applyForce(f) { this.acc.add(f); }
+
+  update() {
+    this.vel.add(this.acc);
+    this.pos.add(this.vel);
+    this.acc.mult(0);
+
+    if (this.pos.y >= tableY) {
+      if (!this.isFeeding) {
+        this.pos.y = tableY;
+        this.vel.y *= -0.1;
+
+        if (abs(this.vel.y) < 0.2) this.vel.y = 0;
+        if (this.vel.mag() < 0.3) this.vel.set(0, 0);
+      }
+
+      this.lifespan -= 2.5;
+
+      if (this.lifespan < 160) {
+        this.emoji = '🍂';
+        this.isFeeding = true;
+      }
+    } else if (!this.isFeeding) {
+      this.rot += 0.05;
+    }
+  }
+
+  show(c) {
+    c.push();
+    c.translate(this.pos.x, this.pos.y);
+    c.rotate(this.rot);
+
+    let alpha = this.isFeeding ? 255 * this.fade : this.lifespan;
+
+    c.fill(255, alpha);
+    c.textSize(this.size);
+    c.text(this.emoji, 0, 0);
+
+    c.pop();
+  }
+
+  isDead() {
+    return this.lifespan <= 0 || this.size < 2 || this.fade < 0.05 || this.pos.y < -100;
+  }
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  layer = createGraphics(windowWidth, windowHeight);
+  glowLayer = createGraphics(windowWidth, windowHeight);
+} 
+````
+
 [ver](https://editor.p5js.org/juliSf22/full/28kmEcal5)
 
+### cuando son florecitas
+
+<img width="729" height="564" alt="image" src="https://github.com/user-attachments/assets/a7434857-1772-4863-a598-b55ae1301c5b" />
+
+
+
+### cuando se transforma en hojas
+
+<img width="674" height="563" alt="image" src="https://github.com/user-attachments/assets/00c4179a-0818-4ea3-9c3a-e71541f83ad6" />
+
+
+
+
+### cuando mueren y dan un feedback visual
+
+
+<img width="523" height="596" alt="image" src="https://github.com/user-attachments/assets/cc72a6e0-dda7-4abe-9485-11b871120514" />
 
 
 
