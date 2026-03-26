@@ -36,7 +36,81 @@ El lifetime controla la transparencia: a medida que disminuye, la partícula se 
 
 ### Actividad 2
 
+¿Qué responsabilidades pasaron a la clase Emitter?
+En el ejemplo anterior, draw() manejaba todo: crear partículas, almacenarlas, recorrer el arreglo, actualizarlas y eliminarlas. Ahora, esas tareas se trasladan al Emitter, que se encarga internamente de todo ese proceso. El draw() solo le indica al emisor que ejecute su ciclo (run())
+
+Ventaja de encapsular la lógica
+La principal ventaja es la organización y escalabilidad. Al tener emisores independientes, puedes manejar múltiples sistemas (como humo, fuego o lluvia) sin complicar el código principal ni mezclar responsabilidades
+
+¿Quién crea los emisores y quién las partículas?
+El programa principal crea los emisores y los guarda en un arreglo. Luego, cada emisor genera sus propias partículas dentro de su estructura interna
 [editar](https://editor.p5js.org/juliSf22/sketches/28kmEcal5)
+
+### Actividad 3: 
+¿Qué tienen en común las subclases de partículas? ¿Qué tienen de diferente?
+
+
+Todas las subclases comparten lo básico porque heredan de la clase principal: posición, velocidad, aceleración y lifespan. También usan el mismo comportamiento para actualizarse y para saber cuándo desaparecen
+Lo diferente está en cómo se ven y en pequeños cambios propios. Por ejemplo, una puede dibujarse como círculo y otra como un cuadrado que gira, agregando cosas extra como un ángulo.
+
+¿Por qué es importante que el Emitter no necesite saber qué tipo específico de partícula está gestionando?
+
+
+Porque así el código se mantiene simple. El emisor no tiene que estar preguntando qué tipo es cada partícula, solo las recorre y les dice que se actualicen y se dibujen. Cada una ya sabe cómo hacerlo. Eso hace que sea más fácil agregar nuevos tipos sin romper nada.
+
+Si quisieras agregar un tercer tipo de partícula, ¿qué tendrías que crear y qué NO tendrías que modificar?
+
+
+Tendrías que crear una nueva clase que herede de la partícula base y cambiar cómo se dibuja. También tocar un poco la parte donde se crean para incluir ese nuevo tipo.
+No tendrías que modificar la lógica principal: ni cómo se actualizan, ni cómo se eliminan, ni cómo el emisor recorre el arreglo.
+
+Compara con Example 4.2: ¿Cambió la lógica del Emitter? ¿Cambió la lógica de muerte? ¿Qué capa se modificó y cuáles quedaron intactas?
+
+
+No cambió ni la lógica del emisor ni la forma en que las partículas mueren, todo eso sigue igual
+Se mantiene igual la parte de estructura y la base del comportamiento. Lo que cambia es la parte visual y la forma en que se crean distintos tipos de partículas
+
+### Actividad 4:
+
+¿Dónde se define la gravedad y quién la aplica? ¿Es global o local?**
+ La gravedad se define en el entorno principal. El sistema de partículas se encarga de aplicarla a cada partícula. Es una fuerza global porque afecta a todas por igual.
+
+¿Qué diferencia hay entre la gravedad y el repeller?**
+ La gravedad es constante y viene del entorno general. El repeller está en su propia clase y calcula la fuerza dependiendo de la posición de cada partícula. Por eso la gravedad es global y el repeller es local.
+
+¿Qué principio físico se está modelando?**
+ Se basa en una relación donde la fuerza depende de la distancia, más cerca es más fuerte. Es como la Ley de Gravitación Universal de Newton.
+
+¿Cambió la clase Particle entre 4.6 y 4.7? ¿Qué implica?**
+ No cambió. Eso significa que la partícula está separada de las fuerzas. Solo recibe vectores y los aplica, sin importar de dónde vienen.
+
+---
+
+**Tabla comparativa**
+
+| Aspecto                 | 4.2          | 4.4          | 4.5          | 4.6          | 4.7          |
+| ----------------------- | ------------ | ------------ | ------------ | ------------ | ------------ |
+| ¿Quién crea partículas? | draw()       | Emisor       | Emisor       | Emisor       | Emisor       |
+| ¿Hay emisor?            | No           | Sí           | Sí           | Sí           | Sí           |
+| ¿Hay herencia?          | No           | No           | Sí           | No           | No           |
+| ¿Hay fuerzas externas?  | No           | No           | No           | Sí           | Sí           |
+| ¿Hay interacción?       | No           | No           | No           | No           | Sí           |
+| ¿Cómo mueren?           | lifespan ≤ 0 | lifespan ≤ 0 | lifespan ≤ 0 | lifespan ≤ 0 | lifespan ≤ 0 |
+
+---
+¿Qué cambiaste?**
+ Solo cambié la dirección del vector en el repeller, multiplicándolo por -1.
+
+¿Qué modificaste?**
+ Solo el método del repeller que calcula la fuerza.
+
+¿Qué no tocaste?**
+ No cambié ni la partícula, ni el sistema, ni el draw().
+
+¿Por qué funcionó sin romper todo?**
+ Porque cada parte está separada. El repeller solo manda una fuerza, y el resto del sistema la usa igual sin importar cómo se calculó.
+
+
 
 ## Bitácora de aplicación 
 
@@ -343,20 +417,20 @@ function windowResized() {
 
 [ver](https://editor.p5js.org/juliSf22/full/28kmEcal5)
 
-### cuando son florecitas
+#### cuando son florecitas
 
 <img width="729" height="564" alt="image" src="https://github.com/user-attachments/assets/a7434857-1772-4863-a598-b55ae1301c5b" />
 
 
 
-### cuando se transforma en hojas
+#### cuando se transforma en hojas
 
 <img width="674" height="563" alt="image" src="https://github.com/user-attachments/assets/00c4179a-0818-4ea3-9c3a-e71541f83ad6" />
 
 
 
 
-### cuando mueren y dan un feedback visual
+#### cuando mueren y dan un feedback visual
 
 
 <img width="523" height="596" alt="image" src="https://github.com/user-attachments/assets/cc72a6e0-dda7-4abe-9485-11b871120514" />
