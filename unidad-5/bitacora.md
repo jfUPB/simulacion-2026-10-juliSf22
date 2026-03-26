@@ -321,7 +321,6 @@ function draw() {
         p.show(layer);
       }
 
-      // FLASH MÁS SUTIL
       if (p.isDead()) {
         treeFlash = 80; // antes 150 → ahora más suave
         particles.splice(i, 1);
@@ -454,3 +453,29 @@ function windowResized() {
 
 
 ## Bitácora de reflexión
+
+Una partícula es una entidad con estado.
+
+
+
+2) Una partícula tiene ciclo de vida.
+- las particulas cuentan con diferentes etapas en la vida representado con estados donde unos de los más importantes y fundamentales son su "nacimiento y muerte"
+  
+3) Un sistema de partículas gestiona colecciones dinámicas de elementos.
+- como pueden exitir "diferentes tipos de particulas" 
+
+4) La creación y eliminación de partículas no es un detalle técnico menor, sino parte central del modelo.   
+- es muy importante, no se puedem crear particulas infinitamente sin que "mueran" porque el rendimiento se verá muuuuuy afectado
+
+5) Debe haber separación entre la lógica de una partícula individual y la lógica del sistema/emisor.
+- porque el sistema emisor es el que maneja la creación de las particulas como tal, pero la logica de las particulas puede variar sin afectar su emision osea pueden haber varios tipos de particulas las cuales son manejadas por el mismo emisor
+  
+6) Un emisor o particle system es una abstracción importante.
+-  cuando abstraes un sistema lo que haces es mantener lo importante por lo que ves el funcionamiento del sistema más a lo general.
+
+7) Pueden existir sistemas de sistemas.
+- 
+
+Puede haber heterogeneidad usando herencia y polimorfismo.
+Las partículas pueden responder a fuerzas globales y locales.
+La representación visual puede variar sin cambiar el principio algorítmico de fondo.
