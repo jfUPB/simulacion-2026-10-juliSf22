@@ -454,15 +454,14 @@ function windowResized() {
 
 ## Bitácora de reflexión
 
-Una partícula es una entidad con estado.
-
-
+1) Una partícula es una entidad con estado.
+- este principio indica que una partícula no es solo un objeto, sino que también tiene un conjunto de propiedades que describen su condición en un momento dado, gracias a ese conjunto de valores  puede determinar cómo se comporta y cómo cambia con el tiempo
 
 2) Una partícula tiene ciclo de vida.
 - las particulas cuentan con diferentes etapas en la vida representado con estados donde unos de los más importantes y fundamentales son su "nacimiento y muerte"
   
 3) Un sistema de partículas gestiona colecciones dinámicas de elementos.
-- como pueden exitir "diferentes tipos de particulas" 
+- un sistema de particulas maneja muchas particulas al mismo tiempo las cuales cambian/evolve constantemente
 
 4) La creación y eliminación de partículas no es un detalle técnico menor, sino parte central del modelo.   
 - es muy importante, no se puedem crear particulas infinitamente sin que "mueran" porque el rendimiento se verá muuuuuy afectado
@@ -471,11 +470,23 @@ Una partícula es una entidad con estado.
 - porque el sistema emisor es el que maneja la creación de las particulas como tal, pero la logica de las particulas puede variar sin afectar su emision osea pueden haber varios tipos de particulas las cuales son manejadas por el mismo emisor
   
 6) Un emisor o particle system es una abstracción importante.
--  cuando abstraes un sistema lo que haces es mantener lo importante por lo que ves el funcionamiento del sistema más a lo general.
+- cuando abstraes un sistema lo que haces es mantener lo importante por lo que ves el funcionamiento del sistema más a lo general
 
 7) Pueden existir sistemas de sistemas.
-- 
+- este principio significa que un sistema de partículas puede formar parte de otro sistema más grande osea, pueden existir varios sistemas trabajando en conjunto
 
-Puede haber heterogeneidad usando herencia y polimorfismo.
-Las partículas pueden responder a fuerzas globales y locales.
-La representación visual puede variar sin cambiar el principio algorítmico de fondo.
+8) Puede haber heterogeneidad usando herencia y polimorfismo.
+- permite tener distintos tipos de partículas con comportamientos diferentes dentro de un mismo sistema, reutilizando estructuras comunes y adaptando lo que cambia
+
+9) Las partículas pueden responder a fuerzas globales y locales.
+- si, si pueden
+
+10) La representación visual puede variar sin cambiar el principio algorítmico de fondo.
+- la apariencia externa puede variar sin necesidad de que el funcionamiento de la particula cambie
+
+¿Qué se mantendría igual y qué cambiaría? ¿Qué partes de tu diseño son independientes de la herramienta?
+
+unity: no sabria hacerlo ni con IA :c
+Blender: quedaria más chido
+
+pero en genral la idea no depende del programa en cualquiera se podria representar la misma narrativa solo que con una "skin diferente"
