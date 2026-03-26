@@ -14,7 +14,27 @@ el tiempo de vida, so esto se mescla con el cambio en la opacidad de la misma pa
 
 ¿Cómo se actualiza la partícula en cada frame? Identifica el patrón motion 101 dentro de la partícula.
 
-pues se genera, y con fuerzas (que se calculan cada frame cada frame) generan movimiento
+pues se genera, y con fuerzas (que se calculan cada frame cada frame) generan movimiento, En cada frame se sigue el esquema de Motion 101, Al mismo tiempo, el lifetime disminuye constantemente, reflejando el envejecimiento de la partícula
+
+¿Quién crea las partículas? ¿Cuándo?
+Las partículas son generadas desde el programa principal, normalmente dentro de la función draw(), por lo que se crean de manera continua en cada frame
+
+¿Quién decide eliminarlas?
+El sistema principal controla cuándo eliminar una partícula del arreglo. La partícula solo indica si ya “murió”, pero no se elimina por sí misma
+
+¿Por qué recorrer el array en orden inverso?
+Se recorre en orden inverso porque al eliminar elementos, los índices cambian. Si se hiciera hacia adelante, algunas partículas podrían saltarse y no evaluarse correctamente, causando fallos en el sistema
+
+¿Qué pasa si no se eliminan?
+Si nunca se eliminaran, el arreglo crecería indefinidamente, consumiendo más memoria y reduciendo el rendimiento, lo que provocaría una caída notable en el frame rate
+
+¿Cómo se representa una partícula?
+Visualmente, cada partícula se muestra como una figura simple (generalmente un círculo) con color y nivel de transparencia
+
+Relación entre tiempo de vida y apariencia
+El lifetime controla la transparencia: a medida que disminuye, la partícula se vuelve más tenue hasta desaparecer completamente
+
+### Actividad 2
 
 [editar](https://editor.p5js.org/juliSf22/sketches/28kmEcal5)
 
