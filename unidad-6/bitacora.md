@@ -4,6 +4,7 @@
 
 
 ## Bitácora de aplicación 
+````js
 let song, fft;
 let songs = [];
 let currentSong = 0;
@@ -164,5 +165,5 @@ function windowResized() {
   rows = floor(height / scale);
   background(0);
 }
-
+````
 ## Bitácora de reflexión
