@@ -1,7 +1,52 @@
 # Unidad 6
 
 ## Bitácora de proceso de aprendizaje
+### actividad 1
 
+Obra 1
+
+Decisiones visuales:
+La composición llena el lienzo pero mantiene márgenes definidos, como si estuviera enmarcada. La densidad varía mucho: hay zonas con muchas líneas finas y otras más despejadas con formas gruesas. El movimiento sigue curvas suaves y orgánicas que, en conjunto, generan estructuras más complejas como remolinos. El color se basa en paletas cuidadosamente elegidas, generalmente tonos cálidos con algunos acentos vivos, sobre fondos tipo papel en lugar de negro. El ritmo surge de la variación en longitud y grosor de las líneas: se repite la dirección general, pero los cambios evitan que se vuelva monótono.
+
+¿Por qué funciona?
+Fidenza destaca porque rompe con la perfección digital y parece hecha a mano. La restricción de que las líneas no se crucen genera tensión visual, como si las formas compitieran por el espacio, dando sensación de peso a lo digital.
+
+Hipótesis del sistema:
+Se basa en un Flow Field estático creado con ruido de Perlin de baja frecuencia, lo que produce curvas amplias. Muchos agentes recorren este campo dibujando líneas, pero se detienen si van a chocar con otras (evitan colisiones). Cada agente tiene características aleatorias como grosor, color y longitud, lo que introduce variedad en el resultado.
+
+### actividad 2
+
+¿Qué es un agente autónomo?
+Es una entidad computacional con estado propio que percibe su entorno y toma decisiones para cumplir un objetivo. A diferencia de una partícula que solo sigue reglas físicas, un agente actúa con “intención”: sabe dónde está, evalúa lo que lo rodea (objetivos, obstáculos u otros agentes) y decide hacia dónde moverse, limitado por su velocidad y capacidad de giro.
+
+¿Qué es una steering force (fuerza de dirección)?
+Es el cálculo matemático que traduce esa intención en movimiento. En vez de ir directamente al objetivo, el agente ajusta su trayectoria comparando su estado actual con el deseado:
+Fuerza = Velocidad deseada − Velocidad actual
+Es básicamente una corrección que lo empuja a alinearse con su meta.
+
+Comparación: steering force vs. fuerzas externas
+Las fuerzas externas (como gravedad o viento) pertenecen al entorno: son pasivas y afectan al objeto sin que este decida. En cambio, las steering forces nacen dentro del agente: son activas y dependen de su percepción. Es la diferencia entre una roca que cae y un pájaro que ajusta su vuelo para llegar a un punto.
+
+¿Por qué esto es útil visualmente?
+Porque permite crear comportamientos emergentes y orgánicos. En lugar de animar todo manualmente o usar azar sin control, se diseñan “personalidades” (huir, agruparse, evitar choques). Con eso, muchos agentes generan movimientos complejos, fluidos y naturales sin intervención directa: en vez de dibujar formas, se diseña el comportamiento que las produce.
+
+### actividad 3
+
+Arquitectura del sistema
+El campo de flujo se construye como una cuadrícula que cubre el lienzo, donde cada celda guarda un vector con una dirección. Estas direcciones suelen generarse con ruido de Perlin para que cambien de forma suave entre celdas. Cada vector representa la “velocidad deseada” en ese punto, como si fuera la corriente de un río.
+El agente usa su posición para ubicar en qué celda está (dividiendo sus coordenadas según la resolución) y toma ese vector como referencia. Luego aplica la regla:
+Fuerza = Velocidad deseada − Velocidad actual,
+lo que curva su movimiento para alinearse con el flujo.
+
+Parámetros críticos
+La resolución define el nivel de detalle: baja resolución produce movimientos bruscos, alta resolución genera fluidez.
+La velocidad máxima limita qué tan rápido se mueve el agente.
+La fuerza máxima define su “personalidad”: valores altos hacen que siga el flujo de forma inmediata, mientras que valores bajos lo vuelven más pesado y con curvas amplias.
+La cantidad de agentes controla la densidad visual: pocos muestran trayectorias individuales, muchos crean texturas colectivas.
+
+Análisis perceptual y musical
+Este sistema genera movimientos continuos, suaves y orgánicos, similares al humo o al agua. Visualmente transmite calma e inevitabilidad, aunque con cambios más extremos puede sugerir caos o turbulencia.
+Funciona mejor con música ambiental o de evolución lenta (como ambient, post-rock o piezas orquestales suaves), ya que no tiene ritmo marcado sino un flujo constante que acompaña bien cambios progresivos de intensidad.
 
 ## Bitácora de aplicación 
 
@@ -9,15 +54,15 @@
 
 quiero mostrar una electrocardiograma que suba con las frecuencias bajas, y pueda cambiar de color
 
-### 2. Relación con el tema musical
+#### 2. Relación con el tema musical
 
 quiero mostrar el bajo, el intrumento que no se "escucha" ese es el que quiero que se vea, entonces quiero que tenga como una especie de forma como el electrocardiograma para mostrar que es una de las partes fundamentales del las canciones entonces lo relaciono como el corazon.
 
-### 3. Pantalla completa
+#### 3. Pantalla completa
 
 para que no hayan distracciones inecesarias y te centres en lo que se quiere mostrar
 
-### 4. Interacción performativa e Interacción con sentido musical
+#### 4. Interacción performativa e Interacción con sentido musical
 
 cambie el color con una tecla y que cuando preciones (1,2,3) se cambien de "cancion" en verdad son la misma pero una sin bajo otra normal de estudio y una version en vivo
 
@@ -27,13 +72,13 @@ cambie el color con una tecla y que cuando preciones (1,2,3) se cambien de "canc
 <img width="337" height="280" alt="image" src="https://github.com/user-attachments/assets/661929cd-fdd1-4db9-904e-92cf791bed90" />
 <img width="1200" height="675" alt="image" src="https://github.com/user-attachments/assets/58d4e17b-ff39-4dca-9c35-fee5c872eb09" />
 
-### boceto
+#### boceto
 <img width="1011" height="229" alt="image" src="https://github.com/user-attachments/assets/0c0cb98b-deef-4cc4-891b-7d1669ae7a2a" />
 <img width="423" height="329" alt="image" src="https://github.com/user-attachments/assets/dbaf718c-666d-4423-a74b-8e7782854b3b" />
 
 
 
-### mapa de deciciones
+#### mapa de deciciones
 
 - electrocardiograma para mostrar que es una de las partes fundamentales del las canciones entonces lo relaciono como el corazon.
 
@@ -42,11 +87,11 @@ cambie el color con una tecla y que cuando preciones (1,2,3) se cambien de "canc
 - los numeros para cambiara de cancion/version para mostrar los diferentes bajos y pues puedan tambien sentirlo
 
 
-### Uso justificado del algoritmo
+#### Uso justificado del algoritmo
 
 Usé **flow fields** mediante ruido Perlin para generar pequeñas variaciones en la posición de la línea y en el movimiento de partículas, este campo se modula con el bajo (60–160 Hz), haciendo que el movimiento sea más intenso cuando hay energía grave, para no perder la sincronización con la música o pues que se vea nomá porque xi.
 
-### Uso explícito de IA como materializador
+#### Uso explícito de IA como materializador
 
 basicamente fue usada para codificar y arreglar errores, porque toda la idea fue meramente mia nada de lo creativo/performativo salió de la ia
 
@@ -76,7 +121,7 @@ let noiseOffset = 0;
 // partículas
 let particles = [];
 
-// 🔥 control cambio automático
+// control cambio automático
 let cooldown = 0;
 
 function preload() {
@@ -137,7 +182,7 @@ function draw() {
 
   yValues[xPos] = currentY;
 
-  // 🔥 DETECTAR ALTURA REAL
+  //  DETECTAR ALTURA REAL
   let amplitudeNow = abs(currentY - baselineY);
 
   if (amplitudeNow > maxAmplitude * 0.45 && cooldown <= 0) {
