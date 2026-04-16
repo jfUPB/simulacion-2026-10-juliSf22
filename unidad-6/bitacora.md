@@ -37,7 +37,7 @@ cambie el color con una tecla y que cuando preciones (1,2,3) se cambien de "canc
 
 - electrocardiograma para mostrar que es una de las partes fundamentales del las canciones entonces lo relaciono como el corazon.
 
-- la c para cambiar de color es para que no sea un color al azar y tampoco variacion de colores porque la gracia es que represente a un instrumento no a todos
+- la c para cambiar de color dependiendo de picos y pues con una tecla
 
 - los numeros para cambiara de cancion/version para mostrar los diferentes bajos y pues puedan tambien sentirlo
 
@@ -73,8 +73,11 @@ let smoothBass = 0;
 // flow
 let noiseOffset = 0;
 
-// ✨ partículas
+// partículas
 let particles = [];
+
+// 🔥 control cambio automático
+let cooldown = 0;
 
 function preload() {
   soundFormats('mp3', 'wav');
@@ -122,7 +125,7 @@ function draw() {
     currentY = baselineY + waveValue * maxAmplitude * activation;
   }
 
-  // FLOW reactivo
+  // FLOW
   let noiseScale = 0.005;
   noiseOffset += map(activation, 0, 1, 0.002, 0.02);
 
@@ -133,6 +136,16 @@ function draw() {
   currentY += flowOffset * 0.25;
 
   yValues[xPos] = currentY;
+
+  // 🔥 DETECTAR ALTURA REAL
+  let amplitudeNow = abs(currentY - baselineY);
+
+  if (amplitudeNow > maxAmplitude * 0.45 && cooldown <= 0) {
+    currentPalette = (currentPalette + 1) % palettes.length;
+    cooldown = 20; // evita spam
+  }
+
+  cooldown--;
 
   // colita
   for (let i = 0; i < width; i++) {
@@ -159,7 +172,7 @@ function draw() {
   }
   endShape();
 
-  // ✨ GENERAR PARTÍCULAS (más bajo = más)
+  // partículas
   let spawnCount = floor(map(activation, 0, 1, 0, 3));
   for (let i = 0; i < spawnCount; i++) {
     particles.push({
@@ -169,7 +182,6 @@ function draw() {
     });
   }
 
-  // ✨ ACTUALIZAR PARTÍCULAS
   noStroke();
   for (let i = particles.length - 1; i >= 0; i--) {
     let p = particles[i];
@@ -190,7 +202,6 @@ function draw() {
     }
   }
 
-  // avanzar
   xPos += speed;
   if (xPos >= width) xPos = 0;
 }
