@@ -120,14 +120,25 @@ mi interpretacioin va a comenzar mostrando que el fondo, osea las particulas se 
 con el ritmo de la musica las particulas se mueven un poco más rapido o más lento aparte de que brillan un poco tambien
 
 ````js
-// ──────────────────────────────────────────────────────────────────────────────
-//  i · m · á · n  –  Audio-reactive flow field · Plop snap · Polarity toggle
-//  v3 – Dual-layer particles: slow dust + fast sparks, stronger music reactivity
-// ──────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+//  i · m · á · n  —  sketch.js
+//  Partículas de campo magnético + letras con Matter.js
+//
+//  · Click             → iniciar audio
+//  · Arrastrar         → mover letras
+//  · Doble-click       → reiniciar
+//  · Click derecho     → activar / desactivar imán (une / separa la palabra)
+//
+//  Comportamiento de partículas:
+//  · Letras separadas  → flujo de ruido + atracción a cada letra individual
+//  · Palabra completa  → las partículas toman la forma de LIMADURAS DE HIERRO
+//                        (líneas cortas alineadas con el campo dipolar)
+//                        La música las hace brillar, no las desorganiza.
+// ─────────────────────────────────────────────────────────────────────────────
 
 const { Engine, Bodies, Body, World, Mouse, MouseConstraint, Events } = Matter;
 
-// ── Constants (original) ─────────────────────────────────────────────────────
+// ── Constantes de letras ──────────────────────────────────────────────────────
 const WORD      = ['i','m','á','n'];
 const RADIUS    = 38;
 const FONT_SZ   = 90;
@@ -143,43 +154,29 @@ const PALETTE = [
   [65,  255, 145],
 ];
 
-// ── Matter.js state ───────────────────────────────────────────────────────────
+// ── Estado de Matter.js ───────────────────────────────────────────────────────
 let engine, world, mCons;
 let letters = [];
 let groups  = new Map();
 
-// ── Audio state ───────────────────────────────────────────────────────────────
+// ── Audio ─────────────────────────────────────────────────────────────────────
 let song, plop;
 let fftAnalyzer, ampAnalyzer;
-let audioReady       = false;
-let polarityInverted = false;
+let audioReady    = false;
 
-// ── Flow-field + particle state ───────────────────────────────────────────────
-//  Two layers share a single array for one iteration pass per frame:
-//    · "dust"  (spark=false) — 320 larger, slower, softer particles
-//    · "spark" (spark=true)  — 200 smaller, brighter, more audio-reactive
-//  Total 520 particles — dense enough to read the music clearly.
-const NUM_DUST   = 320;
-const NUM_SPARKS = 200;
-const NUM_PARTICLES = NUM_DUST + NUM_SPARKS;
+// ── Imán ──────────────────────────────────────────────────────────────────────
+let magnetEnabled = true;
 
-const FLOW_COLS = 30;
-const FLOW_ROWS = 22;
-let particles   = [];
-let flowField   = [];
-let flowTime    = 0;
+// ── Partículas ────────────────────────────────────────────────────────────────
+const NUM_PARTICLES = 560;
+let particles = [];
+let flowTime  = 0;
 
-// ── Polarity flash overlay ────────────────────────────────────────────────────
-let flashAlpha = 0;
-
-// ── Letter influence radii ────────────────────────────────────────────────────
-const SOLO_ATTRACT_R    = 170;
-const GROUP_INFLUENCE_R = 220;
+// ── Transición suave entre modos ──────────────────────────────────────────────
+// fieldBlend: 0 = modo flujo, 1 = modo limadura
+let fieldBlend = 0;
 
 // ─────────────────────────────────────────────────────────────────────────────
-function isAdjacent(a, b) { return Math.abs(a - b) === 1; }
-
-// ═════════════════════════════════════════════════════════════════════════════
 new p5(function (s) {
 
   // ── Preload ────────────────────────────────────────────────────────────────
@@ -193,11 +190,9 @@ new p5(function (s) {
     const cnv = s.createCanvas(s.windowWidth, s.windowHeight);
 
     cnv.elt.addEventListener('dblclick', resetAll);
-
     cnv.elt.addEventListener('contextmenu', (e) => {
       e.preventDefault();
-      polarityInverted = !polarityInverted;
-      flashAlpha = 180;
+      toggleMagnet();
     });
 
     const startAudio = () => {
@@ -209,11 +204,11 @@ new p5(function (s) {
     };
     document.addEventListener('click', startAudio);
 
+    // Intentar fullscreen
     const req = () => {
       if (document.documentElement.requestFullscreen)
         document.documentElement.requestFullscreen().catch(() => {});
     };
-    req();
     document.addEventListener('click', req, { once: true });
 
     s.textFont('Georgia');
@@ -223,9 +218,9 @@ new p5(function (s) {
 
     const T = 60;
     World.add(world, [
-      Bodies.rectangle(s.width / 2,     s.height + T / 2,  s.width * 3,  T, { isStatic: true }),
-      Bodies.rectangle(-T / 2,          s.height / 2,       T, s.height * 3, { isStatic: true }),
-      Bodies.rectangle(s.width + T / 2, s.height / 2,       T, s.height * 3, { isStatic: true }),
+      Bodies.rectangle(s.width / 2,     s.height + T / 2, s.width * 3,  T,          { isStatic: true }),
+      Bodies.rectangle(-T / 2,           s.height / 2,     T, s.height * 3,           { isStatic: true }),
+      Bodies.rectangle(s.width + T / 2,  s.height / 2,     T, s.height * 3,           { isStatic: true }),
     ]);
 
     spawnLetters();
@@ -233,7 +228,6 @@ new p5(function (s) {
 
     const mm = Mouse.create(cnv.elt);
     mm.pixelRatio = s.pixelDensity();
-
     mCons = MouseConstraint.create(engine, {
       mouse: mm,
       constraint: { stiffness: 0.4, damping: 0.1 },
@@ -264,20 +258,19 @@ new p5(function (s) {
 
     const spectrum = fftAnalyzer.analyze();
     const amp      = ampAnalyzer.getLevel();
+    flowTime += 0.0016 + amp * 0.005;
 
-    updateFlowField(spectrum, amp);
-    updateAndDrawParticles(amp, spectrum);
+    // Actualizar blend suavemente
+    const wordComplete = isWordComplete();
+    const targetBlend  = wordComplete ? 1 : 0;
+    fieldBlend += (targetBlend - fieldBlend) * 0.035;
 
-    if (flashAlpha > 0) {
-      const col = polarityInverted ? [255, 60, 60] : [60, 160, 255];
-      s.noStroke();
-      s.fill(col[0], col[1], col[2], flashAlpha);
-      s.rect(0, 0, s.width, s.height);
-      flashAlpha = Math.max(0, flashAlpha - 14);
+    updateAndDrawParticles(amp, spectrum, wordComplete);
+
+    if (magnetEnabled) {
+      applyMagneticForces();
+      applySnap();
     }
-
-    applyMagneticForces();
-    if (!polarityInverted) applySnap();
     propagateGroupMovement();
 
     for (const l of letters) drawLetter(l);
@@ -288,194 +281,247 @@ new p5(function (s) {
     initParticles();
   };
 
-  // ── Particle init ──────────────────────────────────────────────────────────
+  // ── Toggle imán ────────────────────────────────────────────────────────────
+  function toggleMagnet() {
+    magnetEnabled = !magnetEnabled;
+    if (!magnetEnabled) splitAllGroups();
+  }
+
+  function splitAllGroups() {
+    for (let i = 0; i < letters.length; i++) {
+      letters[i].leader  = -1;
+      letters[i].offsetX = 0;
+      letters[i].offsetY = 0;
+      Body.setStatic(letters[i].body, false);
+      Body.set(letters[i].body, 'ignoreGravity', false);
+      groups.set(i, [i]);
+      // pequeño impulso al separarse
+      Body.setVelocity(letters[i].body, {
+        x: (Math.random() - 0.5) * 6,
+        y: (Math.random() - 0.5) * 3 - 1,
+      });
+    }
+  }
+
+  // ── ¿Palabra completa? ─────────────────────────────────────────────────────
+  function isWordComplete() {
+    if (!magnetEnabled) return false;
+    const l0 = getLeader(0);
+    for (let i = 1; i < letters.length; i++) {
+      if (getLeader(i) !== l0) return false;
+    }
+    const g = groups.get(l0);
+    return g && g.length === letters.length;
+  }
+
+  function getWordCenter() {
+    let cx = 0, cy = 0;
+    for (const l of letters) {
+      cx += l.body.position.x;
+      cy += l.body.position.y;
+    }
+    return { x: cx / letters.length, y: cy / letters.length };
+  }
+
+  // ── Campo dipolar 2D ───────────────────────────────────────────────────────
+  // Dipolo horizontal: polo S a la izquierda (letra 'i'), polo N a la derecha ('n')
+  // Las líneas de campo forman arcos cerrados de N → S por el exterior.
+  function getDipoleField(px, py, cx, cy, halfLen) {
+    const eps = 2500; // suavizado cerca de los polos
+
+    // Polo S (izquierda) — campo entra
+    const sx   = cx - halfLen, sy = cy;
+    const dxs  = px - sx,      dys = py - sy;
+    const rs2  = dxs * dxs + dys * dys + eps;
+    const rs   = Math.sqrt(rs2);
+    const bxs  = -dxs / (rs2 * rs);
+    const bys  = -dys / (rs2 * rs);
+
+    // Polo N (derecha) — campo sale
+    const nx2  = cx + halfLen, ny2 = cy;
+    const dxn  = px - nx2,     dyn = py - ny2;
+    const rn2  = dxn * dxn + dyn * dyn + eps;
+    const rn   = Math.sqrt(rn2);
+    const bxn  =  dxn / (rn2 * rn);
+    const byn  =  dyn / (rn2 * rn);
+
+    return { bx: bxn + bxs, by: byn + bys };
+  }
+
+  // ── Inicializar partículas ─────────────────────────────────────────────────
   function initParticles() {
     particles = [];
-
-    // Slow dust — spread uniformly across the canvas
-    for (let i = 0; i < NUM_DUST; i++) {
+    for (let i = 0; i < NUM_PARTICLES; i++) {
       particles.push({
-        x:     s.random(s.width),
-        y:     s.random(s.height),
-        vx:    0, vy: 0,
-        col:   PALETTE[Math.floor(s.random(PALETTE.length))],
-        age:   s.random(1000),
-        spark: false,
-      });
-    }
-
-    // Fast sparks — start more centrally so they're inside the action
-    for (let i = 0; i < NUM_SPARKS; i++) {
-      particles.push({
-        x:     s.random(s.width  * 0.1, s.width  * 0.9),
-        y:     s.random(s.height * 0.1, s.height * 0.9),
-        vx:    0, vy: 0,
-        col:   PALETTE[Math.floor(s.random(PALETTE.length))],
-        age:   s.random(1000),
-        spark: true,
+        x:   s.random(s.width),
+        y:   s.random(s.height),
+        vx:  0,
+        vy:  0,
+        col: PALETTE[Math.floor(s.random(PALETTE.length))],
+        age: s.random(1000),
       });
     }
   }
 
-  // ── Flow-field update ──────────────────────────────────────────────────────
-  function updateFlowField(spectrum, amp) {
-    flowTime += 0.0018 + amp * 0.014;
-
-    flowField = [];
-    for (let row = 0; row < FLOW_ROWS; row++) {
-      for (let col = 0; col < FLOW_COLS; col++) {
-        const nx = col / FLOW_COLS;
-        const ny = row / FLOW_ROWS;
-
-        const specIdx = Math.floor(nx * spectrum.length * 0.65);
-        const specVal = spectrum[specIdx] / 255;
-
-        const noiseAng = s.noise(nx * 2.8, ny * 2.8, flowTime) * s.TWO_PI * 2;
-        const audioAng = specVal * s.PI * (polarityInverted ? -1.6 : 1.6);
-
-        flowField.push({
-          angle:    noiseAng + audioAng,
-          strength: 0.35 + specVal * 1.9,
-          specVal,                           // local frequency energy (0–1)
-        });
-      }
-    }
-  }
-
-  // ── Particle update + draw (single pass) ───────────────────────────────────
-  function updateAndDrawParticles(amp, spectrum) {
-    s.noStroke();
-
-    const letterInfo = buildLetterInfo();
-
-    // Bass energy (low-freq bins) drives a global kick felt by sparks
+  // ── Actualizar y dibujar partículas ───────────────────────────────────────
+  function updateAndDrawParticles(amp, spectrum, wordComplete) {
+    // Energía de bajos (primeros 5 bins)
     let bassEnergy = 0;
     for (let b = 0; b < 5; b++) bassEnergy += spectrum[b] / 255;
     bassEnergy /= 5;
 
+    let wordCenter, halfLen;
+    if (fieldBlend > 0.01) {
+      wordCenter = getWordCenter();
+      halfLen    = (letters.length - 1) * RADIUS * 1.08;
+    }
+
     for (const p of particles) {
 
-      // ── 1. Flow-field force ──────────────────────────────────────────────
-      const gCol = Math.floor((p.x / s.width)  * FLOW_COLS);
-      const gRow = Math.floor((p.y / s.height) * FLOW_ROWS);
-      const idx  = Math.max(0, Math.min(flowField.length - 1, gRow * FLOW_COLS + gCol));
-      const { angle, strength, specVal } = flowField[idx];
+      // ── Fuerza del flujo de ruido (modo normal) ──────────────────────────
+      const noiseAng = s.noise(p.x * 0.0026, p.y * 0.0026, flowTime) * s.TWO_PI * 2;
+      const specIdx  = Math.min(spectrum.length - 1,
+                         Math.floor((p.x / s.width) * spectrum.length * 0.6));
+      const specVal  = spectrum[specIdx] / 255;
+      const flowSpd  = (0.35 + amp * 1.8 + specVal * 0.5) * (1 - fieldBlend);
 
-      // Sparks respond ~2× harder to the flow than dust
-      const reactMult = p.spark ? 1.9 : 1.0;
-      const spd0      = (0.5 + amp * 3.8) * strength * reactMult;
+      let fxFlow = Math.cos(noiseAng) * flowSpd * 0.12;
+      let fyFlow = Math.sin(noiseAng) * flowSpd * 0.12;
 
-      p.vx += Math.cos(angle) * spd0 * 0.1;
-      p.vy += Math.sin(angle) * spd0 * 0.1;
+      // Atracción a letras individuales (solo en modo flujo)
+      if (fieldBlend < 0.95) {
+        for (const l of letters) {
+          const dx   = l.body.position.x - p.x;
+          const dy   = l.body.position.y - p.y;
+          const dist = Math.hypot(dx, dy);
+          if (dist < 4 || dist > 165) continue;
+          const t = (1 - dist / 165) * (1 - fieldBlend);
+          fxFlow += (dx / dist) * 0.11 * t * t;
+          fyFlow += (dy / dist) * 0.11 * t * t;
+        }
+      }
 
-      // Sparks: extra random kick on loud bass transients
-      if (p.spark && bassEnergy > 0.5) {
-        const kick = (bassEnergy - 0.5) * 4.0;
+      // ── Fuerza del campo dipolar (modo limadura) ──────────────────────────
+      let fxField = 0, fyField = 0;
+      let fieldAngle = 0, fieldStrength = 0;
+
+      if (fieldBlend > 0.01 && wordCenter) {
+        const { bx, by } = getDipoleField(p.x, p.y, wordCenter.x, wordCenter.y, halfLen);
+        fieldStrength = Math.hypot(bx, by);
+        fieldAngle    = Math.atan2(by, bx);
+
+        const blen   = fieldStrength + 1e-12;
+        const fnx    = bx / blen, fny = by / blen;
+        // Velocidad de deriva: suave, música solo le da un pequeño impulso
+        const driftSpd = (0.45 + amp * 0.55) * fieldBlend;
+        fxField = (fnx * driftSpd - p.vx) * 0.07 * fieldBlend;
+        fyField = (fny * driftSpd - p.vy) * 0.07 * fieldBlend;
+
+        // Impulso suave de música: existe pero tiende a amortiguarse rápido
+        if (bassEnergy > 0.38) {
+          const kick = (bassEnergy - 0.38) * amp * 1.1 * fieldBlend;
+          fxField += (Math.random() - 0.5) * kick;
+          fyField += (Math.random() - 0.5) * kick;
+        }
+      }
+
+      // ── Integrar ──────────────────────────────────────────────────────────
+      p.vx += fxFlow + fxField;
+      p.vy += fyFlow + fyField;
+
+      // Bajos en modo flujo
+      if (fieldBlend < 0.95 && bassEnergy > 0.42) {
+        const kick = (bassEnergy - 0.42) * 2.2;
         p.vx += (Math.random() - 0.5) * kick;
         p.vy += (Math.random() - 0.5) * kick;
       }
 
-      // ── 2. Letter magnetic influence ─────────────────────────────────────
-      applyLetterInfluence(p, letterInfo, amp);
-
-      // ── 3. Speed clamp + damping ──────────────────────────────────────────
+      // Clamp de velocidad
       const spd    = Math.hypot(p.vx, p.vy);
-      const maxSpd = p.spark ? 3.4 + amp * 7.0 : 2.4 + amp * 5.5;
+      const maxSpd = fieldBlend > 0.5
+        ? 1.2 + amp * 1.4
+        : 2.0 + amp * 3.8;
       if (spd > maxSpd) { p.vx *= maxSpd / spd; p.vy *= maxSpd / spd; }
 
-      p.vx *= p.spark ? 0.94 : 0.91;
-      p.vy *= p.spark ? 0.94 : 0.91;
+      // Amortiguación: más fuerte en modo campo para mantener la forma
+      const damp = fieldBlend > 0.5 ? 0.84 : 0.91;
+      p.vx *= damp;
+      p.vy *= damp;
+
       p.x  += p.vx;
       p.y  += p.vy;
 
-      // ── 4. Wrap edges ─────────────────────────────────────────────────────
-      if (p.x < 0)         p.x = s.width;
-      if (p.x > s.width)   p.x = 0;
-      if (p.y < 0)         p.y = s.height;
-      if (p.y > s.height)  p.y = 0;
+      // Wrap
+      if (p.x < 0)        p.x = s.width;
+      if (p.x > s.width)  p.x = 0;
+      if (p.y < 0)        p.y = s.height;
+      if (p.y > s.height) p.y = 0;
       p.age++;
 
-      // ── 5. Proximity bonus (brighter near any letter) ─────────────────────
+      // ── Dibujar ───────────────────────────────────────────────────────────
       const [r, g, b] = p.col;
+
+      // Proximidad a cualquier letra (bonus de brillo)
       let proxBonus = 0;
-      for (const info of letterInfo) {
-        const dd = Math.hypot(info.x - p.x, info.y - p.y);
-        proxBonus += Math.max(0, 1 - dd / 130) * 0.65;
+      for (const l of letters) {
+        const dd = Math.hypot(l.body.position.x - p.x, l.body.position.y - p.y);
+        proxBonus += Math.max(0, 1 - dd / 115) * 0.65;
       }
       proxBonus = Math.min(proxBonus, 1.0);
 
-      // ── 6. Draw ───────────────────────────────────────────────────────────
-      if (p.spark) {
-        // Small, intense, reacts strongly to local frequency energy
-        const alpha = Math.min(85 + amp * 165 + proxBonus * 105 + specVal * 80, 245);
-        const sz    = (1.1 + amp * 2.6 + specVal * 2.2) * (1 + proxBonus * 0.8);
-        s.drawingContext.shadowBlur  = 7 + amp * 22 + proxBonus * 22 + specVal * 14;
-        s.drawingContext.shadowColor = `rgba(${r},${g},${b},${0.5 + proxBonus * 0.45})`;
-        s.fill(r, g, b, alpha);
-        s.ellipse(p.x, p.y, sz, sz);
+      // Intensidad del campo local (para brillo de limadura)
+      let fg = 0;
+      if (fieldBlend > 0.01 && wordCenter) {
+        const { bx: bx2, by: by2 } = getDipoleField(p.x, p.y, wordCenter.x, wordCenter.y, halfLen);
+        fg = Math.min(Math.hypot(bx2, by2) * 0.55, 1.0);
+      }
+
+      if (fieldBlend > 0.05) {
+        // ── Modo limadura: línea corta alineada con el campo ──────────────
+        // Recalcular ángulo en posición actual
+        let drawAngle = fieldAngle;
+        if (wordCenter) {
+          const { bx: bxD, by: byD } = getDipoleField(p.x, p.y, wordCenter.x, wordCenter.y, halfLen);
+          drawAngle = Math.atan2(byD, bxD);
+          fg        = Math.min(Math.hypot(bxD, byD) * 0.55, 1.0);
+        }
+
+        const alpha  = Math.min(
+          55 * (1 - fieldBlend) +
+          (70 + amp * 145 + fg * 95 + proxBonus * 80) * fieldBlend,
+          240);
+        const segLen = (4 + fg * 7 + amp * 3) * fieldBlend + 1.5 * (1 - fieldBlend);
+        const ex     = Math.cos(drawAngle) * segLen / 2;
+        const ey     = Math.sin(drawAngle) * segLen / 2;
+
+        s.noFill();
+        s.strokeWeight((0.7 + amp * 0.7 + fg * 0.5) * fieldBlend + 0.5 * (1 - fieldBlend));
+        s.strokeCap(s.ROUND);
+        s.stroke(r, g, b, alpha);
+        s.drawingContext.shadowBlur  = (3 + amp * 11 + fg * 9 + proxBonus * 10) * fieldBlend;
+        s.drawingContext.shadowColor = `rgba(${r},${g},${b},${(0.28 + amp * 0.28 + fg * 0.22) * fieldBlend})`;
+        s.line(p.x - ex, p.y - ey, p.x + ex, p.y + ey);
 
       } else {
-        // Larger, steadier — carries the visible shape of the field
-        const alpha = Math.min(58 + amp * 115 + proxBonus * 95 + specVal * 55, 225);
-        const sz    = (2.6 + amp * 3.8 + specVal * 1.8) * (1 + proxBonus * 0.8);
-        s.drawingContext.shadowBlur  = 5 + amp * 15 + proxBonus * 16;
-        s.drawingContext.shadowColor = `rgba(${r},${g},${b},${0.28 + proxBonus * 0.38})`;
+        // ── Modo flujo: punto circular ────────────────────────────────────
+        const alpha = Math.min(42 + amp * 110 + proxBonus * 85 + specVal * 45, 220);
+        const sz    = 1.5 + amp * 2.6 + proxBonus * 1.3;
+
+        s.noStroke();
         s.fill(r, g, b, alpha);
+        s.drawingContext.shadowBlur  = 4 + amp * 13 + proxBonus * 15;
+        s.drawingContext.shadowColor = `rgba(${r},${g},${b},${0.22 + proxBonus * 0.32})`;
         s.ellipse(p.x, p.y, sz, sz);
       }
     }
 
     s.drawingContext.shadowBlur = 0;
+    s.noStroke();
   }
 
-  // ── Letter info snapshot ───────────────────────────────────────────────────
-  function buildLetterInfo() {
-    const info = [];
-    for (let i = 0; i < letters.length; i++) {
-      const l         = letters[i];
-      const leaderId  = getLeader(i);
-      const grp       = groups.get(leaderId) || [leaderId];
-      const [r, g, b] = l.col;
-      info.push({
-        x: l.body.position.x, y: l.body.position.y,
-        groupSize: grp.length,
-        r, g, b,
-      });
-    }
-    return info;
-  }
+  // ── Física ─────────────────────────────────────────────────────────────────
 
-  // ── Magnetic influence on a single particle ───────────────────────────────
-  function applyLetterInfluence(p, letterInfo, amp) {
-    for (const info of letterInfo) {
-      const dx   = info.x - p.x;
-      const dy   = info.y - p.y;
-      const dist = Math.hypot(dx, dy);
-      if (dist < 4) continue;
-
-      const nx = dx / dist;
-      const ny = dy / dist;
-
-      if (info.groupSize === 1) {
-        if (dist > SOLO_ATTRACT_R) continue;
-        const t = 1 - dist / SOLO_ATTRACT_R;
-        const f = (0.22 + amp * 0.18) * t * t;
-        p.vx += nx * f;
-        p.vy += ny * f;
-
-      } else {
-        if (dist > GROUP_INFLUENCE_R) continue;
-        const t    = 1 - dist / GROUP_INFLUENCE_R;
-        const sign = info.groupSize % 2 === 0 ? 1 : -1;
-        const tx   = -ny * sign;
-        const ty   =  nx * sign;
-        p.vx += tx * (0.14 + amp * 0.12) * t * t - nx * (0.06 + amp * 0.04) * t;
-        p.vy += ty * (0.14 + amp * 0.12) * t * t - ny * (0.06 + amp * 0.04) * t;
-      }
-    }
-  }
-
-  // ── Physics helpers (IDENTICAL to original) ───────────────────────────────
+  function isAdjacent(a, b) { return Math.abs(a - b) === 1; }
 
   function spawnLetters() {
     letters = [];
@@ -488,13 +534,23 @@ new p5(function (s) {
         { restitution: 0.15, friction: 0.05, frictionAir: 0.04, density: 0.003 }
       );
       World.add(world, body);
-      letters.push({ body, char: WORD[i], idx: i, col: PALETTE[i], leader: -1, offsetX: 0, offsetY: 0 });
+      letters.push({
+        body,
+        char: WORD[i],
+        idx:  i,
+        col:  PALETTE[i],
+        leader:  -1,
+        offsetX: 0,
+        offsetY: 0,
+      });
       groups.set(i, [i]);
     }
   }
 
   function resetAll() {
     for (const l of letters) World.remove(world, l.body);
+    magnetEnabled = true;
+    fieldBlend    = 0;
     spawnLetters();
   }
 
@@ -509,17 +565,15 @@ new p5(function (s) {
         if (dist < 1) continue;
         const nx = dx / dist, ny = dy / dist;
         if (isAdjacent(a.idx, b.idx)) {
-          const t    = Math.max(0, Math.min(1, (SNAP_DIST * 1.8 - dist) / (SNAP_DIST * 1.8)));
-          const f    = ATTRACT_S * Math.pow(t, 3);
-          const sign = polarityInverted ? -1 : 1;
-          applyToGroup(i,  sign * nx * f,  sign * ny * f);
-          applyToGroup(j, -sign * nx * f, -sign * ny * f);
+          const t = Math.max(0, Math.min(1, (SNAP_DIST * 1.8 - dist) / (SNAP_DIST * 1.8)));
+          const f = ATTRACT_S * Math.pow(t, 3);
+          applyToGroup(i,  nx * f,  ny * f);
+          applyToGroup(j, -nx * f, -ny * f);
         } else if (dist < INFLUENCE) {
-          const t    = Math.max(0, Math.min(1, (INFLUENCE - dist) / INFLUENCE));
-          const f    = REPEL_S * t * t;
-          const sign = polarityInverted ? -1 : 1;
-          applyToGroup(i, -sign * nx * f, -sign * ny * f);
-          applyToGroup(j,  sign * nx * f,  sign * ny * f);
+          const t = Math.max(0, Math.min(1, (INFLUENCE - dist) / INFLUENCE));
+          const f = REPEL_S * t * t;
+          applyToGroup(i, -nx * f, -ny * f);
+          applyToGroup(j,  nx * f,  ny * f);
         }
       }
     }
@@ -556,12 +610,16 @@ new p5(function (s) {
 
     for (const mid of absorbedMembers) {
       const slotX = (letters[mid].idx - letters[newLeader].idx) * RADIUS * 2.0;
-      letters[mid].leader = newLeader; letters[mid].offsetX = slotX; letters[mid].offsetY = 0;
+      letters[mid].leader  = newLeader;
+      letters[mid].offsetX = slotX;
+      letters[mid].offsetY = 0;
       Body.setStatic(letters[mid].body, true);
     }
     for (const mid of leaderMembers) {
       if (mid === newLeader) {
-        letters[mid].leader = -1; letters[mid].offsetX = 0; letters[mid].offsetY = 0;
+        letters[mid].leader  = -1;
+        letters[mid].offsetX = 0;
+        letters[mid].offsetY = 0;
       } else {
         letters[mid].offsetX = (letters[mid].idx - letters[newLeader].idx) * RADIUS * 2.0;
         letters[mid].offsetY = 0;
@@ -574,7 +632,10 @@ new p5(function (s) {
     Body.set(letters[newLeader].body, 'ignoreGravity', newMembers.length > 1);
     snapPositions(newLeader);
 
-    if (plop && plop.isLoaded()) { plop.rate(s.random(0.82, 1.18)); plop.play(); }
+    if (plop && plop.isLoaded()) {
+      plop.rate(s.random(0.82, 1.18));
+      plop.play();
+    }
   }
 
   function propagateGroupMovement() {
@@ -590,7 +651,10 @@ new p5(function (s) {
     for (const mid of groups.get(leaderId)) {
       if (mid === leaderId) continue;
       const m = letters[mid];
-      Body.setPosition(m.body, { x: lp.x + m.offsetX * Math.cos(la), y: lp.y + m.offsetX * Math.sin(la) });
+      Body.setPosition(m.body, {
+        x: lp.x + m.offsetX * Math.cos(la),
+        y: lp.y + m.offsetX * Math.sin(la),
+      });
       Body.setAngle(m.body, la);
       Body.setVelocity(m.body, { x: 0, y: 0 });
     }
@@ -602,7 +666,7 @@ new p5(function (s) {
     return cur;
   }
 
-  // ── Letter renderer (IDENTICAL to original) ───────────────────────────────
+  // ── Dibujar letra (sin cambios respecto al original) ──────────────────────
   function drawLetter(l) {
     const pos = l.body.position, ang = l.body.angle;
     const [r, g, b] = l.col;
@@ -623,6 +687,11 @@ new p5(function (s) {
 });
 ````
 [app](https://editor.p5js.org/juliSf22/full/6ap33djkL)
+<img width="509" height="376" alt="image" src="https://github.com/user-attachments/assets/1f8decdd-5bc6-45db-813e-cb851301739d" />
+
+
+
+<img width="995" height="714" alt="image" src="https://github.com/user-attachments/assets/e780797f-9194-4017-b060-a98960517125" />
 
 
 ## Bitácora de reflexión
