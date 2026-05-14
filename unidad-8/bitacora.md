@@ -112,5 +112,14 @@ El principio que se mantiene es la lógica de influencia espacial y distancia: e
 ### Mapa de decisiones
 
 decidí que queria hacer de esas animaciones en loop queria que fuera un objeto pero luego me decidí por una palabra para poder ponerle tambien una reaccion al color
+proximidad → magnitud → respuesta espacial
+
+
+https://github.com/user-attachments/assets/02596cb6-1aed-42c6-bcf8-4399bc9f200b
+
+<img width="1300" height="665" alt="image" src="https://github.com/user-attachments/assets/fbd7bb34-7728-4deb-a3c8-f17dbfc0fdc7" />
+<img width="1203" height="573" alt="image" src="https://github.com/user-attachments/assets/a16e97f0-b174-4156-9f1b-f3e83b13a01d" />
+
+
 
 ## Bitácora de reflexión
