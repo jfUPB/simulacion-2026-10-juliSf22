@@ -48,7 +48,7 @@ Visualmente, busca inspirarse en los gráficos generativos sobrios, que suelen e
 - controlar correctamente los atributos y materiales dentro de Geometry Nodes
 - y controlar cómo interactúan varias fuerzas al mismo tiempo
 - que cada palabra tenga su diferencial
-- 
+  
 ### Actividad 03:
 #### Describe qué componentes o módulos necesitas aprender en tu herramienta:
 
@@ -77,5 +77,40 @@ Esta transferencia me permitió entender cómo un mismo sistema puede ganar nuev
 
 ## Bitácora de aplicación 
 
+### Herramienta elegida
+Blender 4.2 Geometry Nodes
+es la heramienta con la que mas estoy familiarizada y me interesa aprender bastante de esta, más una parte tan importante como los Geometry Nodes
+
+### Sistema transferido
+
+El sistema que voy a transferir es un sistema de fuerzas y proximidad aplicado a tipografía semántica animada
+
+### Contexto profesional concreto
+
+textos para comerciales o vizualizers y obio con un poco más de trabajo para portafolio
+
+### Concepto visual
+
+pues la idea esque asemejara a una de esas animaciones en loop, pero pues aprovehando las palabras para que interactuen diferente y no sea tán repetitivo
+
+
+### Referencias
+
+<img width="2560" height="1440" alt="image" src="https://github.com/user-attachments/assets/87d9ee93-62d5-43ce-840f-3049e081b858" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/871029f3-7630-4766-bd64-fd28f5074f42" />
+<img width="1344" height="576" alt="image" src="https://github.com/user-attachments/assets/2280b854-be75-49ea-a6ea-4aedca50570d" />
+
+### Bocetos
+
+<img width="1309" height="693" alt="image" src="https://github.com/user-attachments/assets/a4030909-f4b4-41a1-b36b-b5c50e6a26f5" />
+<img width="1457" height="719" alt="image" src="https://github.com/user-attachments/assets/a63394cc-3daa-4e1f-88fa-acce16463b17" />
+
+### Explicación de transferencia
+
+El principio que se mantiene es la lógica de influencia espacial y distancia: en ambos entornos, la proximidad entre elementos genera comportamiento dinámico. Sin embargo, la implementación cambia drásticamente. En p5.js se trabajaba con código lineal, actualizando fuerzas y posiciones frame por frame mediante vectores y operaciones matemáticas. En Blender, el mismo sistema se reconstruye de forma procedural y visual mediante nodos, campos y atributos. La proximidad pasa de ser un cálculo manual con vectores a usar el nodo Geometry Proximity, que afecta directamente a la geometría 3D real. Las ventajas nuevas son evidentes: se obtiene control espacial inmediato, deformaciones complejas sobre mallas, integración con materiales, iluminación y render profesional
+
+### Mapa de decisiones
+
+decidí que queria hacer de esas animaciones en loop queria que fuera un objeto pero luego me decidí por una palabra para poder ponerle tambien una reaccion al color
 
 ## Bitácora de reflexión
