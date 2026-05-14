@@ -1,4 +1,3 @@
-# Unidad 8
 
 ## Bitácora de proceso de aprendizaje
 
@@ -48,7 +47,33 @@ Visualmente, busca inspirarse en los gráficos generativos sobrios, que suelen e
 
 - controlar correctamente los atributos y materiales dentro de Geometry Nodes
 - y controlar cómo interactúan varias fuerzas al mismo tiempo
-- que cada palabra tenga su diferencial 
+- que cada palabra tenga su diferencial
+- 
+### Actividad 03:
+#### Describe qué componentes o módulos necesitas aprender en tu herramienta:
+
+el geometry node es el más importante y la base del sistema pero su hermanito sería el map range
+
+<img width="1116" height="744" alt="image" src="https://github.com/user-attachments/assets/2d5e4fa7-d826-4816-836f-1a6516ead2bc" />
+
+<img width="1038" height="650" alt="image" src="https://github.com/user-attachments/assets/f56dd055-e0d8-4d8c-8607-00b76f8a2a00" />
+
+estaba mirando cual de lás 2 opciones quedaba mejor pero como sea lo que ya está resuelto es que si funciona la "interactividad"
+
+pues la verdad los colores, se supone que las bolitas se van a pintar del color de la palabra
+
+### Actividad 04:
+| Aspecto            | En p5.js                                                               | En Blender / Geometry Nodes                                         | Qué se mantiene                                     | Qué cambia                                                         | Ventajas nuevas                                 | Limitaciones nuevas                                      |
+| ------------------ | ---------------------------------------------------------------------- | ------------------------------------------------------------------- | --------------------------------------------------- | ------------------------------------------------------------------ | ----------------------------------------------- | -------------------------------------------------------- |
+| Sistema principal  | Sistema de fuerzas y proximidad basado en distancia entre objetos      | Sistema procedural usando Geometry Proximity y deformación de malla | La lógica de influencia espacial y distancia        | El sistema deja de ser código lineal y pasa a ser nodal/procedural | Mayor control visual y espacial en 3D           | Mayor complejidad técnica en la organización de nodos    |
+| Proximidad         | Distancia calculada con vectores y operaciones matemáticas             | Geometry Proximity calcula automáticamente cercanía sobre geometría | La distancia sigue controlando comportamiento       | Ahora la proximidad afecta geometría real en espacio 3D            | Más precisión visual y deformaciones complejas  | Más consumo de rendimiento con geometría densa           |
+| Movimiento         | Movimiento generado mediante variables y actualización frame por frame | Transformaciones y deformaciones proceduralmente controladas        | El comportamiento dinámico                          | El movimiento se vuelve dependiente de campos y atributos          | Posibilidad de integrar simulación y materiales | Algunas animaciones son menos intuitivas que programando |
+| Sistema generativo | Reglas programadas manualmente en código                               | Sistema construido mediante nodos y campos                          | El uso de reglas para generar resultados emergentes | Cambia la forma de pensar el sistema                               | Visualización inmediata de resultados           | Los nodos pueden volverse difíciles de organizar         |
+| Materiales y color | Colores controlados por variables y funciones                          | Materiales procedurales y atributos en shaders                      | El color sigue reaccionando al sistema              | El color ahora puede mezclarse espacialmente sobre superficies     | Integración avanzada con iluminación y render   | Configurar atributos puede ser complejo                  |
+
+la lógica detrás del comportamiento generativo es lo realmente importante,los Geometry Nodes cambia la forma de pensar el sistema. En p5.js el enfoque era más matemático y paso a paso, mientras que en Blender trabajas de manera procedural y visual, conectando nodos, campos y atributos.
+
+Esta transferencia me permitió entender cómo un mismo sistema puede ganar nuevas posibilidades expresivas según la herramienta que uses. En Blender, el sistema adquiere profundidad espacial, materiales, iluminación acercándose más al motion graphics profesional y a la visualización generativa actual
 
 ## Bitácora de aplicación 
 
